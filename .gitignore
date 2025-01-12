@@ -1,0 +1,33 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### Allure
+.allure
+
+### JMeter reports ###
+src/test/jmeter/report*
+src/test/jmeter/reportResult.jtl
+src/test/jmeter/jmeter.log
+
+test-output
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
