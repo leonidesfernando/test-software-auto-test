@@ -2,7 +2,6 @@ package br.com.home.lab.softwaretesting.automation.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 @AllArgsConstructor
 public enum Category {
@@ -19,14 +18,13 @@ public enum Category {
     CAR ("car"),
     @JsonProperty("LOAN")
     LOAN("loan"),
-    @JsonProperty("INVESTIMENTS")
-    INVESTIMENTS("investiments"),
+    @JsonProperty("INVESTMENTS")
+    INVESTMENTS("investments"),
     @JsonProperty("CLOTHING")
     CLOTHING("clothing"),
     @JsonProperty("OTHER")
     OTHER("other");
 
 
-    @Getter
     private String nome;
 }

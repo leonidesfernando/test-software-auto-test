@@ -155,9 +155,6 @@ public class EntriesListAction extends BaseAction<EntriesListPage>{
 
     @Step("Checking the successful entry registry message")
     public boolean checkSuccessfulEntryRegistyMessage(){
-        System.out.println("\n\n\n\n\n\n################################");
-        System.out.println(page.getAlert().getText().toLowerCase());
-        System.out.println("################################\n\n\n\n\n\n");
         final String message = page.getAlert().getText().toLowerCase();
         return  message.contains("success") || message.contains("sucesso");
     }

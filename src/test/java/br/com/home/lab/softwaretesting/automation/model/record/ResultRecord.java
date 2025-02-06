@@ -1,5 +1,7 @@
 package br.com.home.lab.softwaretesting.automation.model.record;
 
+import br.com.home.lab.softwaretesting.automation.model.Entry;
+
 import java.util.List;
 
 public record ResultRecord(
@@ -7,7 +9,7 @@ public record ResultRecord(
         String totalEarnings,
         String grandTotalExpenses,
         String grandTotalWinnings,
-        List<EntryRecord> entries,
+        List<Entry> entries,
         int p,
         int pageSize,
         long totalRecords,

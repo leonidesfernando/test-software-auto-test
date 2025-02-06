@@ -31,9 +31,4 @@ public class MoneyDeserialize extends JsonDeserializer<BigDecimal> {
         final BigDecimal valor = new BigDecimal(valorString);
         return valor.setScale(2, RoundingMode.HALF_UP);
     }
-
-    public static void main(String[] args) {
-        String val = "98.64";
-        System.out.println(new BigDecimal(val));
-    }
 }

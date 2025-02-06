@@ -1,13 +1,19 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="Suite-Tests por Classes" parallel="tests" thread-count="10" verbose="1" data-provider-thread-count="6">
-    <!-- listeners>
-        <listener
-                class-name="br.com.home.lab.softwaretesting.automation.selenium.webdriver.config.ScreenshotListener"/>
-    </listeners -->
-    <test name="E2E Tests - Need the app running">
+<suite name="Suite-Tests por Classes" parallel="tests" thread-count="8" data-provider-thread-count="10" >
+    <listeners>
+        <listener class-name="br.com.home.lab.softwaretesting.automation.selenium.webdriver.config.ScreenshotListener"/>
+    </listeners>
+
+    <test name="E2E Tests - Need the app running" thread-count="5" parallel="methods" >
         <classes>
+            <class name="br.com.home.lab.softwaretesting.automation.cucumber.testrunner.TestRunnerManager"/>
+
+        </classes>
+    </test>
+    <test name="E2E Selenium tests">
+        <classes>
+            <class name="br.com.home.lab.softwaretesting.automation.selenium.webdriver.test.EntriesTest" />
             <class name="br.com.home.lab.softwaretesting.automation.restassured.ControllerTest"/>
-            <!-- class name="br.com.home.lab.softwaretesting.automation.selenium.webdriver.test.EntriesTest" / -->
         </classes>
     </test>
 </suite>

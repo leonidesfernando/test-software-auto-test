@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.15</version>
+		<version>3.4.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -21,26 +21,25 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<webdrivermanager.version>5.3.3</webdrivermanager.version>
-		<selenium.version>4.10.0</selenium.version>
-		<lombok.version>1.18.28</lombok.version>
-		<cucumber.version>7.12.1</cucumber.version>
+		<webdrivermanager.version>5.9.2</webdrivermanager.version>
+		<selenium.version>4.28.1</selenium.version>
+		<lombok.version>1.18.36</lombok.version>
+		<cucumber.version>7.21.0</cucumber.version>
 		<argLine>-Xms256m -Xmx1524m -XX:MaxPermSize=256m -Duser.language=en</argLine>
-		<java.faker>2.0.1</java.faker>
+		<java.faker>2.4.2</java.faker>
 		<owner.version>1.0.12</owner.version>
-		<rest-assured.version>5.3.0</rest-assured.version>
-		<httpclient5.version>5.2.1</httpclient5.version>
+		<rest-assured.version>5.5.0</rest-assured.version>
+		<!-- httpclient5.version>5.2.1</httpclient5.version -->
 		<testng.version>7.8.0</testng.version>
 
 		<jacoco.maven.plugin.version>0.8.10</jacoco.maven.plugin.version>
-		<maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
-		<maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
-
+		<maven.surefire.plugin.version>3.5.2</maven.surefire.plugin.version>
+		<maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
 
 		<extentreports-version>5.0.9</extentreports-version>
-		<aspectj.version>1.9.19</aspectj.version>
+		<aspectj.version>1.9.22.1</aspectj.version>
 		<ashot.version>1.5.4</ashot.version>
-		<allure.version>2.23.0</allure.version>
+		<allure.version>2.29.0</allure.version>
 		<allure.cmd.download.url>
 			https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline
 		</allure.cmd.download.url>
@@ -70,6 +69,14 @@
 				<exclusion>
 					<groupId>org.mockito</groupId>
 					<artifactId>mockito-junit-jupiter</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.jayway.jsonpath</groupId>
+					<artifactId>json-path</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.xmlunit</groupId>
+					<artifactId>xmlunit-core</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -166,6 +173,12 @@
 			<groupId>ru.yandex.qatools.ashot</groupId>
 			<artifactId>ashot</artifactId>
 			<version>${ashot.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-io</groupId>
+					<artifactId>commons-io</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.qameta.allure</groupId>
@@ -178,15 +191,22 @@
 			<version>${extentreports-version}</version>
 		</dependency>
 
+		<!-- dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>2.0.16</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.5.16</version>
+		</dependency -->
+
+
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -197,8 +217,6 @@
 						-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
 						-Dcucumber.options="--plugin io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
 					</argLine>
-					<parallel>classes</parallel>
-					<threadCount>8</threadCount>
 					<suiteXmlFiles>
 						<suiteXmlFile>
 							src\test\resources\testng.xml

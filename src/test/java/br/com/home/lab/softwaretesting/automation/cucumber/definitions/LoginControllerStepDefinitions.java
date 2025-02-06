@@ -3,9 +3,7 @@ package br.com.home.lab.softwaretesting.automation.cucumber.definitions;
 import br.com.home.lab.softwaretesting.automation.model.User;
 import br.com.home.lab.softwaretesting.automation.model.record.LoginCredentialRecord;
 import br.com.home.lab.softwaretesting.automation.restassured.RestAssurredUtil;
-import br.com.home.lab.softwaretesting.automation.util.DataGen;
 import br.com.home.lab.softwaretesting.automation.util.LoadConfigurationUtil;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import io.cucumber.java.DataTableType;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -16,9 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static br.com.home.lab.softwaretesting.automation.cucumber.definitions.LoginDataTableValues.VALID_PASSWORD;
-import static br.com.home.lab.softwaretesting.automation.cucumber.definitions.LoginDataTableValues.VALID_USER;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class LoginControllerStepDefinitions {
 
@@ -29,11 +26,9 @@ public class LoginControllerStepDefinitions {
     public void the_following_credentials_then(List<LoginCredentialRecord> credentials){
 
         for (LoginCredentialRecord credential : credentials) {
-            User user = getUserByCredential(credential);
+            var user = getUserByCredential(credential);
             String token =  RestAssurredUtil.doLogin(user, "api/auth/signin");
             Assert.assertTrue(Strings.isNotNullAndNotEmpty(token));
-
-            System.out.println("Credential: " + credential);
         }
     }
 
@@ -53,8 +48,11 @@ public class LoginControllerStepDefinitions {
 
     @Then("a UnrecognizedPropertyException should be thrown for all invalid credentials")
     public void thenAUsernameNotFoundExceptionShouldBeThrownForAllInvalidCredentials() {
+        final int INVALID_CREDENTIALS_TABLE_SIZE = 3;
+        assertEquals(exceptions.size(), INVALID_CREDENTIALS_TABLE_SIZE);
         for (Exception exception : exceptions) {
-            assert exception instanceof UnrecognizedPropertyException;
+            assert exception instanceof RuntimeException;
+            assertTrue(exception.getMessage().contains("UnrecognizedPropertyException"));
         }
     }
 
@@ -75,15 +73,10 @@ public class LoginControllerStepDefinitions {
     }
 
     private String getUserByType(LoginDataTableValues typeUser){
-        if(typeUser == VALID_USER)
-            return user.username();
-        return user.username() + DataGen.number(5);
+        return typeUser.get(user.username());
     }
 
     private String getPasswordByType(LoginDataTableValues typePassword){
-        if(typePassword == VALID_PASSWORD){
-            return user.password();
-        }
-        return DataGen.productName();
+        return typePassword.get(user.password());
     }
 }

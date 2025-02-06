@@ -3,10 +3,15 @@ package br.com.home.lab.softwaretesting.automation.selenium.webdriver.test;
 import br.com.home.lab.softwaretesting.automation.model.Category;
 import br.com.home.lab.softwaretesting.automation.model.EntryRecord;
 import br.com.home.lab.softwaretesting.automation.model.EntryType;
+import br.com.home.lab.softwaretesting.automation.model.record.MessageResponse;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.action.EntriesListAction;
 import br.com.home.lab.softwaretesting.automation.util.DataGen;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Step;
+import io.restassured.response.Response;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -31,14 +36,14 @@ public class EntriesTest extends BaseSeleniumTest {
     static {
 
         entryTypes = new HashMap<>();
-        entryTypes.put(Arrays.asList(Category.INVESTIMENTS, Category.OTHER),
+        entryTypes.put(Arrays.asList(Category.INVESTMENTS, Category.OTHER),
                 Collections.singletonList(EntryType.TRANSF));
 
         entryTypes.put(Arrays.asList(Category.WAGE, Category.OTHER),
                 Collections.singletonList(EntryType.INCOME));
 
         entryTypes.put(Stream.of(Category.values())
-                        .filter(c -> c != Category.INVESTIMENTS && c != Category.WAGE)
+                        .filter(c -> c != Category.INVESTMENTS && c != Category.WAGE)
                         .collect(Collectors.toList()),
                 Collections.singletonList(EntryType.EXPENSE));
     }
@@ -79,10 +84,25 @@ public class EntriesTest extends BaseSeleniumTest {
                         date, entryType, category);
 
         assertTrue(entriesListAction.checkSuccessfulEntryRegistyMessage());
-        assertTrue(entriesListAction.existEntry(description, date, entryType));
-        setEntryInContext(new EntryRecord(description, date, entryType));
 
+        assertTrue(entriesListAction.existEntry(description, date, entryType));
+        setEntryInContext(new EntryRecord(description, date, entryType, category));
     }
+
+    private static TypeReference<MessageResponse> getMessageResponseAsTypeReference() {
+        return new TypeReference<MessageResponse>() {};
+    }
+
+    public static <T> T extractDataFromBodyResponse(Response response, TypeReference<T> typeReference){
+        return extractDataFromBodyResponseByTypeReference(response, typeReference);
+    }
+
+    private static <T> T extractDataFromBodyResponseByTypeReference(Response response, TypeReference<T> type) {
+        var jsonNode = response.body().as(JsonNode.class);
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(jsonNode, type);
+    }
+
 
     @Step("Searching by description from the context")
     @Test(dependsOnMethods = "addEntry")
@@ -163,7 +183,6 @@ public class EntriesTest extends BaseSeleniumTest {
             semaphore.release();
             return entryRecord;
         } catch (InterruptedException e) {
-            e.printStackTrace();
             throw new IllegalStateException(e);
         }
     }
@@ -183,7 +202,6 @@ public class EntriesTest extends BaseSeleniumTest {
             getEntries().add(entryRecord);
             semaphore.release();
         } catch (InterruptedException e) {
-            e.printStackTrace();
             throw new IllegalStateException(e);
         }
     }

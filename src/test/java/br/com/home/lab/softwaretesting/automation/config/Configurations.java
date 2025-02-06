@@ -10,7 +10,11 @@ import org.aeonbits.owner.Config;
 })
 public interface Configurations extends Config {
 
-    String url();
+    @Key("app.url")
+    String appUrl();
+
+    @Key("api.url")
+    String apiUrl();
 
     boolean headless();
 

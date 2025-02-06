@@ -4,9 +4,7 @@ import java.util.Locale;
 
 public interface Constants {
 
-    String TOKEN = "sessionId";
-    String ENTRIES_DESCRIPTION = "entriesDescription";
-    String ENTRIES_IDS = "entriesIds";
+    String AUTH_TOKEN = "authToken";
 
     String dd_MM_yyyy_SLASH = "dd/MM/yyyy";
     String yyyy_MM_dd_SLASH = "yyyy/MM/dd";
@@ -19,4 +17,11 @@ public interface Constants {
     Locale BR_Locale = new Locale("pt", "BR");
     Locale EN_Locale = Locale.US;
 
+
+    String ENTRIES = "lancamentos";
+    String DESCRIPTION = "description";
+    String AMOUNT = "amount";
+    String ENTRY_DATE = "entryDate";
+    String ENTRY_TYPE = "entryType";
+    String CATEGORY = "category";
 }

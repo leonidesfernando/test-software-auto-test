@@ -40,7 +40,7 @@ public abstract class BaseSeleniumTest {
         language = LoadConfigurationUtil.getLanguage();
     }
 
-    public static synchronized WebDriver getWebDriver() {
+    public synchronized WebDriver getWebDriver() {
         return webDriver.get();
     }
 
@@ -73,7 +73,7 @@ public abstract class BaseSeleniumTest {
 
     @Step("Asking the browser to access the URL loaded from LoadConfigurationUtil")
     protected void access() {
-        getWebDriver().get(LoadConfigurationUtil.getUrl());
+        getWebDriver().get(LoadConfigurationUtil.getAppUrl());
     }
 
     @Step("Closing the browser")
@@ -84,12 +84,13 @@ public abstract class BaseSeleniumTest {
             WebDriver driver = getWebDriver();
             if (driver != null) {
                 driver.quit();
+                //driver.close();
             }
             webDriver.remove();
             semaphore.release();
             log.info("Driver and browser closed.");
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Failure to finish webDriver: ",e);
         }
     }
 

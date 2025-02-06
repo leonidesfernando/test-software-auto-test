@@ -10,7 +10,6 @@ import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpMethod;
 
@@ -19,20 +18,19 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
-@UtilityClass
-public class RestAssurredUtil {
+public final class RestAssurredUtil {
 
     record Credentials(String username, String password){}
 
     record LoginApiResponse(String token, String type, int id, String username, String email, List<String> roles){}
 
-    public String doLogin(User user, String endPoint){
+    public static String doLogin(User user, String endPoint){
         LoginApiResponse apiResponse = callLogin(user, endPoint)
                 .getBody().as(LoginApiResponse.class);
         return apiResponse.token;
     }
 
-    private Response callLogin(User user, String endPoint){
+    private static Response callLogin(User user, String endPoint){
         var jsonBody = asJson(new Credentials(user.username(), user.password()));
         return given()
                 .config(RestAssuredConfig.config()
@@ -42,48 +40,45 @@ public class RestAssurredUtil {
                 .request(Method.POST, endPoint);
     }
 
-    public Response post(String token, String endPoint, Object body) {
-        var response = doRequestWithBody(token, HttpMethod.POST, endPoint, body);
-        //response.then().log().all();
-        return response;
+    public static Response post(String token, String endPoint, Object body) {
+        return doRequestWithBody(token, HttpMethod.POST, endPoint, body);
     }
 
-    public Response put(String token, String endPoint, Object body) {
-        var response = doRequestWithBody(token, HttpMethod.PUT, endPoint, body);
-        //response.then().log().all();
-        return response;
+    public static Response put(String token, String endPoint, Object body) {
+        return doRequestWithBody(token, HttpMethod.PUT, endPoint, body);
     }
 
 
-    public Response get(String token, String endpoint) {
+    public static Response get(String token, String endpoint) {
         return baseRequest(token)
                 .get(endpoint);
     }
 
-    public Response delete(String token, String endpoint) {
+    public static Response delete(String token, String endpoint) {
         return baseRequest(token)
                 .delete(endpoint);
     }
 
 
-    public Response get(String token, List<Pair<String, String>> params, String endPoint) {
+    public static Response get(String token, List<Pair<String, String>> params, String endPoint) {
         RequestSpecification specification = baseRequest(token);
         params.forEach(p -> specification.pathParam(p.getLeft(), p.getRight()));
         return specification.get(endPoint);
     }
 
-    private Response doRequestWithBody(String token, HttpMethod method, String endpoint, Object bodyParam) {
+    private static Response doRequestWithBody(String token, HttpMethod method, String endpoint, Object bodyParam) {
         return baseRequest(token)
                 .body(asJson(bodyParam))
                 .request(method.name(), endpoint);
     }
 
-    private RequestSpecification baseRequest(String token){
+    private static RequestSpecification baseRequest(String token){
         return given()
                 .header("Content-Type", "application/json")
                 .header("Authorization", "Bearer "+token);
     }
 
+    @Deprecated
     private void addFormParams(RequestSpecification requestSpecification, Map<String, String> formParams) {
         formParams.entrySet()
                 .forEach(entry ->
@@ -93,12 +88,16 @@ public class RestAssurredUtil {
 
 
     @SneakyThrows
-    private String asJson(Object data){
+    private static String asJson(Object data){
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(data);
     }
 
-    public <T> T extractDataFromBodyResponse(Response response, TypeReference<T> type) {
+    public static <T> T extractDataFromBodyResponse(Response response, TypeReference<T> typeReference){
+        return RestAssurredUtil.extractDataFromBodyResponseByTypeReference(response, typeReference);
+    }
+
+    private static <T> T extractDataFromBodyResponseByTypeReference(Response response, TypeReference<T> type) {
         var jsonNode = response.body().as(JsonNode.class);
         ObjectMapper mapper = new ObjectMapper();
         return mapper.convertValue(jsonNode, type);
