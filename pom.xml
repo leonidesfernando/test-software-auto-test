@@ -22,7 +22,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
 		<webdrivermanager.version>5.9.2</webdrivermanager.version>
-		<selenium.version>4.28.1</selenium.version>
+		<selenium.version>4.29.0</selenium.version>
 		<lombok.version>1.18.36</lombok.version>
 		<cucumber.version>7.21.0</cucumber.version>
 		<argLine>-Xms256m -Xmx1524m -XX:MaxPermSize=256m -Duser.language=en</argLine>

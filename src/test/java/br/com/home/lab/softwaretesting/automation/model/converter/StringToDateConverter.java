@@ -16,12 +16,12 @@ public class StringToDateConverter implements Converter<String, Date> {
         if(null == dateString || dateString.isBlank())
             return null;
         try {
-            return new SimpleDateFormat(Constants.dd_MM_yyyy_SLASH).parse(dateString);
+            return new SimpleDateFormat(Constants.DD_MM_YYYY_SLASH).parse(dateString);
         }catch (ParseException e){
             try {
-                return new SimpleDateFormat(Constants.yyyy_MM_dd_SLASH).parse(dateString);
+                return new SimpleDateFormat(Constants.YYYY_MM_DD_SLASH).parse(dateString);
             }catch (ParseException ee){
-                return  new SimpleDateFormat(Constants.yyyy_MMM_dd_DASH).parse(dateString);
+                return  new SimpleDateFormat(Constants.YYYY_MMM_DD_DASH).parse(dateString);
             }
         }
     }

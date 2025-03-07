@@ -19,6 +19,7 @@ import io.cucumber.java.DataTableType;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import io.qameta.allure.Epic;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.util.Strings;
@@ -33,12 +34,14 @@ import static br.com.home.lab.softwaretesting.automation.util.Constants.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
+@Epic("EntryControllerStepDefinitions - Cucumber tests using API/RestAssured")
 public class EntryControllerStepDefinitions {
 
     private final Semaphore semaphore = new Semaphore(1);
     private static final ScenarioContextData context = new ScenarioContextData();
 
     private static final User user = LoadConfigurationUtil.getUser();
+
 
     @Given("User and password existent in to the settings")
     public void userPasswordExistentSettings() {
@@ -47,7 +50,7 @@ public class EntryControllerStepDefinitions {
 
     @Then("You must log in and access the home page")
     public void youMustLoginAndAccessTheHomePage() {
-        String authToken =  RestAssurredUtil.doLogin(user, "api/auth/signin");
+        String authToken =  RestAssurredUtil.doLogin(user, LOGIN_ENDPOINT);
         Assert.assertTrue(Strings.isNotNullAndNotEmpty(authToken));
         context.setContext(AUTH_TOKEN, authToken);
 
@@ -139,7 +142,7 @@ public class EntryControllerStepDefinitions {
 
         for (Entry entry : entries) {
             Response response = RestAssurredUtil.post(getAuthToken(),
-                    "/api/entries/add", entry);
+                    ADD_ENDPOPINT, entry);
             var id = extractEntryIdFromResponse(response);
             final Entry newEntry = EntryDataUtil.getUpdateEntryData(id, entry);
             addEntryToContext(newEntry);
@@ -149,7 +152,7 @@ public class EntryControllerStepDefinitions {
     private Response searchBy(String item) {
         FormSearch buscaForm = new FormSearch(item, true, 10);
         Response response = RestAssurredUtil.
-                post(getAuthToken(), "/api/entries/search", buscaForm);
+                post(getAuthToken(), SEARCH_ENDPOINT, buscaForm);
         List<Entry> list = RestAssurredUtil
                 .extractDataFromBodyResponse(response, getResultRecordAsTypeReference())
                 .entries();

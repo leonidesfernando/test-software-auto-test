@@ -11,8 +11,8 @@ import org.openqa.selenium.WebDriver;
 
 import static br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil.waitForElementInvisible;
 import static br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil.waitForElementVisible;
-import static br.com.home.lab.softwaretesting.automation.util.Constants.dd_MM_yyyy_SLASH;
-import static br.com.home.lab.softwaretesting.automation.util.Constants.yyyy_MMM_dd_DASH;
+import static br.com.home.lab.softwaretesting.automation.util.Constants.DD_MM_YYYY_SLASH;
+import static br.com.home.lab.softwaretesting.automation.util.Constants.YYYY_MMM_DD_DASH;
 import static org.testng.Assert.*;
 
 public class EntriesListAction extends BaseAction<EntriesListPage>{
@@ -71,7 +71,7 @@ public class EntriesListAction extends BaseAction<EntriesListPage>{
         assertEquals(grid.getElements().size(), 1);
         final var gridDescription = grid.getCellValueAt(0, getMessageByKey(COL_DESCRIPTION));
         assertTrue(gridDescription.contains(entryDescription));
-        assertEquals(grid.getCellValueAt(0, getMessageByKey(COL_RELEASE_DATE)), StringUtil.stringDateAsFormat(date, yyyy_MMM_dd_DASH, dd_MM_yyyy_SLASH));
+        assertEquals(grid.getCellValueAt(0, getMessageByKey(COL_RELEASE_DATE)), StringUtil.stringDateAsFormat(date, YYYY_MMM_DD_DASH, DD_MM_YYYY_SLASH));
         assertEquals(grid.getCellValueAt(0, getMessageByKey(COL_TYPE)), tipo.getDescription(getLanguage()));
 
     }

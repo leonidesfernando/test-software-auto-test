@@ -6,14 +6,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-import static br.com.home.lab.softwaretesting.automation.util.Constants.dd_MM_yyyy_SLASH;
+import static br.com.home.lab.softwaretesting.automation.util.Constants.DD_MM_YYYY_SLASH;
 
 public class DateToStringConverter implements Converter<Date, String> {
 
     @Override
     public String convert(Date date) {
         return Objects.nonNull(date)
-                ? new SimpleDateFormat(dd_MM_yyyy_SLASH).format(date)
+                ? new SimpleDateFormat(DD_MM_YYYY_SLASH).format(date)
                 : null;
     }
 }

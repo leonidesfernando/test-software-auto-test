@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static br.com.home.lab.softwaretesting.automation.util.Constants.LOGIN_ENDPOINT;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -26,8 +27,7 @@ public class LoginControllerStepDefinitions {
     public void the_following_credentials_then(List<LoginCredentialRecord> credentials){
 
         for (LoginCredentialRecord credential : credentials) {
-            var user = getUserByCredential(credential);
-            String token =  RestAssurredUtil.doLogin(user, "api/auth/signin");
+            String token =  RestAssurredUtil.doLogin(getUserByCredential(credential), LOGIN_ENDPOINT);
             Assert.assertTrue(Strings.isNotNullAndNotEmpty(token));
         }
     }
@@ -37,8 +37,7 @@ public class LoginControllerStepDefinitions {
 
         for (LoginCredentialRecord credential : credentials) {
             try {
-                var user = getUserByCredential(credential);
-                RestAssurredUtil.doLogin(user, "api/auth/signin");
+                RestAssurredUtil.doLogin(getUserByCredential(credential), LOGIN_ENDPOINT);
             }catch (Exception e){
                 exceptions.add(e);
             }

@@ -3,15 +3,15 @@ package br.com.home.lab.softwaretesting.automation.selenium.webdriver.test;
 import br.com.home.lab.softwaretesting.automation.model.Category;
 import br.com.home.lab.softwaretesting.automation.model.EntryRecord;
 import br.com.home.lab.softwaretesting.automation.model.EntryType;
-import br.com.home.lab.softwaretesting.automation.model.record.MessageResponse;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.action.EntriesListAction;
 import br.com.home.lab.softwaretesting.automation.util.DataGen;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Description;
+import io.qameta.allure.Epic;
 import io.qameta.allure.Issue;
+import io.qameta.allure.Severity;
+import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Step;
-import io.restassured.response.Response;
+import io.qameta.allure.testng.Tag;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -22,11 +22,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static br.com.home.lab.softwaretesting.automation.util.Constants.REGRESSION_TEST;
+import static br.com.home.lab.softwaretesting.automation.util.Constants.SMOKE_TEST;
 import static org.testng.Assert.assertTrue;
 
+@Epic("Entries test running on Selenium WebDriver")
 public class EntriesTest extends BaseSeleniumTest {
 
     private final Semaphore semaphore = new Semaphore(1);
@@ -44,7 +46,7 @@ public class EntriesTest extends BaseSeleniumTest {
 
         entryTypes.put(Stream.of(Category.values())
                         .filter(c -> c != Category.INVESTMENTS && c != Category.WAGE)
-                        .collect(Collectors.toList()),
+                        .toList(),
                 Collections.singletonList(EntryType.EXPENSE));
     }
 
@@ -56,19 +58,27 @@ public class EntriesTest extends BaseSeleniumTest {
         super();
     }
 
-    @Step("Initializing the context")
     @BeforeClass
     protected void setUp() {
+        initializeTests();
+    }
+
+    @Step("Initializing the context")
+    private void initializeTests(){
         context.setContext(ENTRIES, new LinkedBlockingQueue<EntryRecord>());
     }
 
-    @Step("Performing log into with credentials from configurations")
+    @Description("Performing log into with credentials from configurations")
+    @Tag(REGRESSION_TEST)
+    @Severity(SeverityLevel.BLOCKER)
     @Test
     public void loginEntries() {
         super.login();
     }
 
-    @Step("Registering entries by dynamic data")
+    @Description("Registering entries by dynamic data on web ui")
+    @Severity(SeverityLevel.BLOCKER)
+    @Tag(REGRESSION_TEST)
     @Test(dependsOnMethods = "loginEntries")//, invocationCount = 3)
     public void addEntry() {
 
@@ -89,22 +99,9 @@ public class EntriesTest extends BaseSeleniumTest {
         setEntryInContext(new EntryRecord(description, date, entryType, category));
     }
 
-    private static TypeReference<MessageResponse> getMessageResponseAsTypeReference() {
-        return new TypeReference<MessageResponse>() {};
-    }
-
-    public static <T> T extractDataFromBodyResponse(Response response, TypeReference<T> typeReference){
-        return extractDataFromBodyResponseByTypeReference(response, typeReference);
-    }
-
-    private static <T> T extractDataFromBodyResponseByTypeReference(Response response, TypeReference<T> type) {
-        var jsonNode = response.body().as(JsonNode.class);
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.convertValue(jsonNode, type);
-    }
-
-
-    @Step("Searching by description from the context")
+    @Description("Searching by description from the context")
+    @Tag(REGRESSION_TEST)
+    @Severity(SeverityLevel.BLOCKER)
     @Test(dependsOnMethods = "addEntry")
     void searchForDescription() {
         EntryRecord entryRecord = getEntryInContext();
@@ -116,7 +113,10 @@ public class EntriesTest extends BaseSeleniumTest {
     }
 
     @Issue("It's not searching the item to be edited. It must be fixed")
-    @Step("Editing an entry existing in the context")
+    @Description("Editing an entry existing in the context")
+    @Tag(REGRESSION_TEST)
+    @Tag(SMOKE_TEST)
+    @Severity(SeverityLevel.NORMAL)
     @Test(dependsOnMethods = "searchForDescription")
     void editEntry() {
         String editionSuffix = " EDITED by Selenium";
@@ -135,20 +135,23 @@ public class EntriesTest extends BaseSeleniumTest {
         setEntryInContext(entryRecord);
     }
 
-    @Step("Removing the entry by description collected from the context")
+    @Description("Removing the entry by description collected from the context")
     @Test(dependsOnMethods = "editEntry")
+    @Tag(REGRESSION_TEST)
+    @Severity(SeverityLevel.CRITICAL)
     void removeEntry() {
         EntryRecord entryRecord = getEntryInContext();
         entriesListAction.goHome();
         entriesListAction.removeEntry(entryRecord.description());
     }
 
-    @Step("Performing log out")
+    @Description("Performing log out")
     @Test(dependsOnMethods = "removeEntry")
     public void logout() {
         super.doLogout();
     }
 
+    @Step("Getting a new random description")
     private String getDescription() {
         LocalDateTime dateTime = LocalDateTime.now();
         DateTimeFormatter entryFormat = DateTimeFormatter.ofPattern("dd.MM.yy-ss");
@@ -159,11 +162,14 @@ public class EntriesTest extends BaseSeleniumTest {
         return entryDescription.toString();
     }
 
+    @Step("Getting a new random value")
     private BigDecimal getEntryValue() {
 
         return BigDecimal.valueOf(DataGen.moneyValue())
                 .setScale(2, RoundingMode.HALF_UP);
     }
+
+    @Step("Getting a new random category given the available ones")
     private Category getCategory() {
         return getAny(categories);
     }
@@ -174,6 +180,7 @@ public class EntriesTest extends BaseSeleniumTest {
         return list.get(index);
     }
 
+    @Step("Get one entry from the test context")
     private EntryRecord getEntryInContext() {
         try {
             semaphore.acquire();
@@ -187,6 +194,7 @@ public class EntriesTest extends BaseSeleniumTest {
         }
     }
 
+    @Step("Get EntryType by Category")
     private EntryType getEntryType(Category category) {
         return entryTypes.entrySet().stream()
                 .filter(entry -> entry.getKey().contains(category))
@@ -195,6 +203,7 @@ public class EntriesTest extends BaseSeleniumTest {
                 .orElseThrow(() -> new IllegalStateException("Does not exists 'EntryType' for this category " + category));
     }
 
+    @Step("Setting an entry into the test context")
     private void setEntryInContext(EntryRecord entryRecord) {
         try {
             semaphore.acquire();

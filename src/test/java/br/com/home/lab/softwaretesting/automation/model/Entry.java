@@ -10,7 +10,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import static br.com.home.lab.softwaretesting.automation.util.Constants.dd_MM_yyyy_SLASH;
+import static br.com.home.lab.softwaretesting.automation.util.Constants.DD_MM_YYYY_SLASH;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +26,7 @@ public class Entry {
     @JsonDeserialize(using = MoneyDeserialize.class)
     private BigDecimal amount;
 
-    @JsonFormat(pattern = dd_MM_yyyy_SLASH)
+    @JsonFormat(pattern = DD_MM_YYYY_SLASH)
     private Date entryDate;
 
     @JsonDeserialize(using = EntryTypeDeserialize.class)
