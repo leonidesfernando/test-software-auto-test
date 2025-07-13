@@ -20,11 +20,9 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
-import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import org.testng.util.Strings;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -34,6 +32,7 @@ import static br.com.home.lab.softwaretesting.automation.util.Constants.*;
 import static br.com.home.lab.softwaretesting.automation.util.EntryDataUtil.newValidEntry;
 import static org.hamcrest.Matchers.equalTo;
 import static org.testng.Assert.*;
+import static org.assertj.core.api.Assertions.*;
 
 
 @Epic("ControllerTest - Testing API by RestAssured")
@@ -61,7 +60,7 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
     private void login(){
         User user = LoadConfigurationUtil.getUser();
         String token =  RestAssurredUtil.doLogin(user, LOGIN_ENDPOINT);
-        Assert.assertTrue(Strings.isNotNullAndNotEmpty(token));
+        assertThat(token).isNotBlank();
         context.setContext(AUTH_TOKEN, token);
     }
 
@@ -87,15 +86,15 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
     public void searchEntryTest(){
         List<Entry> list = context.get(ENTRIES);
         int n =  list.size();
-        assert n > 0;
+        assertThat(n).isGreaterThan(0);
         String description = list.get(DataGen.number(0, n-1)).getDescription();
         FormSearch form = new FormSearch(description,true, 1);
 
         Response response = RestAssurredUtil.post(getToken(), SEARCH_ENDPOINT, form);
 
         var result = response.as(ResultRecord.class);
-        var lancamentos = result.entries();
-        assertEquals(lancamentos.size(), 1, "Searched by: " + description);
+        var entries = result.entries();
+        assertThat(entries).hasSize(1);
     }
 
     @Description("Getting an entry added previously from the test context")
@@ -105,14 +104,18 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
     @Test
     void getEntryTest() {
         Response response = RestAssurredUtil.get(getToken(), String.format(GET_ENDPOINT, getIdFromContext()));
-        var lancamentoRecord = response.as(Entry.class);
+        var entries = response.as(Entry.class);
 
-        assertNotEquals(lancamentoRecord.getId(), 0);
-        assertNotNull(lancamentoRecord.getCategory());
-        assertNotNull(lancamentoRecord.getAmount());
-        assertTrue(StringUtils.isNotBlank(lancamentoRecord.getDescription()));
-        assertNotNull(lancamentoRecord.getEntryDate());
-        assertNotNull(lancamentoRecord.getEntryType());
+        assertThat(entries)
+                .extracting(Entry::getId).isNotEqualTo(0);
+        assertThat(entries)
+                        .extracting(Entry::getCategory).isNotNull();
+        assertNotEquals(entries.getId(), 0);
+        assertNotNull(entries.getCategory());
+        assertNotNull(entries.getAmount());
+        assertTrue(StringUtils.isNotBlank(entries.getDescription()));
+        assertNotNull(entries.getEntryDate());
+        assertNotNull(entries.getEntryType());
     }
 
     @Description("Updating an existing entry")

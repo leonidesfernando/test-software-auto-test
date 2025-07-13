@@ -2,6 +2,7 @@ package br.com.home.lab.softwaretesting.automation.util;
 
 import net.datafaker.Faker;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -12,6 +13,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class DataGen {
 
     private static final Faker faker = new Faker();
+
 
     public static String strDate(){
         int month = getMonth();
@@ -74,6 +76,18 @@ public final class DataGen {
         return dateByMonth(month);
     }
 
+    public static LocalDate localDateCurrentMonth(){
+        int month = LocalDate.now().getMonth().getValue();
+        return localDateByMonth(month);
+    }
+
+    private static LocalDate localDateByMonth(int month){
+        int day = getDayByMonth(month);
+        int year = getCurrentYear();
+        return LocalDate.of(year, month-1, day);
+    }
+
+
     private static Date dateByMonth(int month){
         int day = getDayByMonth(month);
         int year = getCurrentYear();
@@ -88,6 +102,10 @@ public final class DataGen {
         return getRandom().nextInt(min, max+1);
     }
 
+    public static BigDecimal amount(){
+        return new BigDecimal(faker.commerce().price());
+    }
+
     public static double moneyValue(){
         return moneyValue(700);
     }
@@ -100,8 +118,7 @@ public final class DataGen {
         return getRandom().nextInt(0, max+1);
     }
 
-    //TODO: try to remove synchronized
-    private static synchronized Random getRandom(){
+    private static Random getRandom(){
         return ThreadLocalRandom.current();
     }
 }

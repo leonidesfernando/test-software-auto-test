@@ -1,5 +1,6 @@
 package br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
@@ -7,6 +8,7 @@ import org.openqa.selenium.support.ui.LoadableComponent;
 
 import java.util.Objects;
 
+@Slf4j
 public abstract class BasePage extends LoadableComponent<BasePage> {
 
     protected ThreadLocal<WebDriver> webDriver = new ThreadLocal<>();
@@ -33,8 +35,7 @@ public abstract class BasePage extends LoadableComponent<BasePage> {
      * <code>LoadableComponemt::isLoaded</code> method</p>
      */
     @Override
-    protected void load() {
-    }
+    protected void load() {}
 
     @Override
     protected void isLoaded() throws Error {
@@ -42,7 +43,7 @@ public abstract class BasePage extends LoadableComponent<BasePage> {
         try{
             loaded = isReady();
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("Error on checking whether page is loaded: {}", e.getMessage());
         }
         if(!loaded){
             throw new Error(String.format("%s is not loaded yet :/", this.getClass().getSimpleName()));

@@ -35,6 +35,7 @@ public class LoginControllerStepDefinitions {
     @Given("The following INVALID credentials are")
     public void the_following_invalid_credentials_are(List<LoginCredentialRecord> credentials){
 
+        exceptions.clear();
         for (LoginCredentialRecord credential : credentials) {
             try {
                 RestAssurredUtil.doLogin(getUserByCredential(credential), LOGIN_ENDPOINT);
@@ -45,10 +46,22 @@ public class LoginControllerStepDefinitions {
         assertEquals(exceptions.size(), credentials.size());
     }
 
+    @Given("The user {string} and password {string} are used to login")
+    public void user_and_password_are_used_to_login(String user, String password){
+        exceptions.clear();
+        LoginCredentialRecord credential = new LoginCredentialRecord(
+                LoginDataTableValues.from(user), LoginDataTableValues.from(password)
+        );
+        try {
+            RestAssurredUtil.doLogin(getUserByCredential(credential), LOGIN_ENDPOINT);
+        }catch (Exception e){
+            exceptions.add(e);
+        }
+    }
+
+
     @Then("a UnrecognizedPropertyException should be thrown for all invalid credentials")
     public void thenAUsernameNotFoundExceptionShouldBeThrownForAllInvalidCredentials() {
-        final int INVALID_CREDENTIALS_TABLE_SIZE = 3;
-        assertEquals(exceptions.size(), INVALID_CREDENTIALS_TABLE_SIZE);
         for (Exception exception : exceptions) {
             assert exception instanceof RuntimeException;
             assertTrue(exception.getMessage().contains("UnrecognizedPropertyException"));

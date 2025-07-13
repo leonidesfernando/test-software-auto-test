@@ -14,6 +14,8 @@ public final class EntryDataUtil {
 
     private static final Category[] categories = Category.values();
 
+    private EntryDataUtil(){}
+
     public static Entry newValidEntry(){
         String description = new StringJoiner(" ")
                 .add("Assured Rest")

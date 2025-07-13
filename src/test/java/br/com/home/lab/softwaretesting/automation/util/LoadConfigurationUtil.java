@@ -1,11 +1,14 @@
 package br.com.home.lab.softwaretesting.automation.util;
 
+import br.com.home.lab.softwaretesting.automation.aws.util.SecretsManagerUtil;
 import br.com.home.lab.softwaretesting.automation.config.Configurations;
 import br.com.home.lab.softwaretesting.automation.model.User;
 import org.aeonbits.owner.ConfigFactory;
 import org.testng.util.Strings;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public final class LoadConfigurationUtil {
@@ -13,6 +16,17 @@ public final class LoadConfigurationUtil {
     private static final String API_URL = "api.url";
     private static final String APP_URL = "app.url";
     private static final Configurations config = ConfigFactory.create(Configurations.class);
+    private static final Map<String, Map<String, String>> secrets = new ConcurrentHashMap<>();
+
+    private LoadConfigurationUtil(){}
+
+    public static Map<String, String> getSecretsDbCredentials(){
+
+        String secretName = config.awsSecretsManagerDbCredentials();
+        return secrets.computeIfAbsent(secretName, key ->
+            SecretsManagerUtil.getSecretKeyValue(secretName)
+        );
+    }
 
     public static String geApiUrl() {
         return getUrl(API_URL, config.apiUrl());

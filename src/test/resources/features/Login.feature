@@ -18,3 +18,14 @@ Feature: Check login for valid and invalid credentials
       | @InvalidUser | @InvalidPassword |
       | @ValidUser   | @InvalidPassword |
     Then a UnrecognizedPropertyException should be thrown for all invalid credentials
+
+
+  Scenario Outline: Login in the system with INVALID credentials
+    Given The user "<User>" and password "<Password>" are used to login
+    Then a UnrecognizedPropertyException should be thrown for all invalid credentials
+
+    Examples:
+      | User         | Password         |
+      | @InvalidUser | @ValidPassword   |
+      | @InvalidUser | @InvalidPassword |
+      | @ValidUser   | @InvalidPassword |
