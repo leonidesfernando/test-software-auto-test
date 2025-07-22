@@ -18,16 +18,15 @@ public class KafkaMessageProducer {
         try{
             producer.send(producerRecord, (RecordMetadata metadata, Exception exception) -> {
                 if(exception != null){
-                    log.error("Fail to send Kafka message: {}", exception.getMessage());
-                    System.out.println("message: "+exception.getMessage());
-                    System.out.println("**********************************************************");
-                    System.out.println("cause: "+exception.getCause());
+                    log.error("Fail to send Kafka message: {} ", exception.getMessage());
+                    throw new IllegalStateException("Fail to send Kafka message", exception);
                 }else{
-                    System.out.println("message sent");
+                    log.info("Message sent");
                 }
             });
+            producer.flush();
         }catch (Exception e){
-            throw new IllegalStateException("Error duing poducing Kafka message: ", e);
+            throw new IllegalStateException("Error during producing Kafka message: ", e);
         }
     }
 

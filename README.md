@@ -2,7 +2,8 @@
 Project to explorer several tests such as API, e2e, integration, load and stress with: TestNG, Mockito, REST Assured,
 Cucumber, Selenium Webdriver
 , [JMeter](src/test/jmeter/README-JMETER.md) and [Postman](src/test/postman/README-POSTMAN.md).
-Also added some features to explore _AWS_ resources like _Lambda Function, S3, and Secrets Manager_.
+Also added some features to explore _Apache Kafka_ to produce and consume messages, and _AWS_ resources like _Lambda Function, S3, and Secrets Manager_.
+
 To run _AWS_ check the optional section.
 
 Also, it's possible generate the [Allure report](https://docs.qameta.io/allure/#_java) first run `mvn allure:install` next
@@ -21,7 +22,7 @@ To run them, you will need:
 
 - Docker
 
-In the first time, the first run, you must execute this command: `docker-compose up`, or the script: `config/dev-local/container-start.bat` or just use the Docker plugin into Intellij or your desired IDE. 
+In the first time, the first run, you must execute this command: `docker-compose up`, or the script: `config/dev-local/container-start.bat` or just use the Docker plugin into Intellij on _**Services**_ view, or your desired IDE. 
 After that you can enable the testing classes
 ```java 
 AwsLocalTests
