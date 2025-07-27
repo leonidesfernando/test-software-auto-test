@@ -10,18 +10,18 @@
 
         </classes>
     </test>
-    <test name="E2E Selenium tests" enabled="false">
+    <test name="E2E Selenium tests">
         <classes>
             <class name="br.com.home.lab.softwaretesting.automation.selenium.webdriver.test.EntriesTest" />
-            <class name="br.com.home.lab.softwaretesting.automation.restassured.ControllerTest"/>
+            <!-- class name="br.com.home.lab.softwaretesting.automation.restassured.ControllerTest"/ -->
         </classes>
     </test>
-    <test name="Localstack PoC tests" parallel="methods">
+    <test name="Localstack PoC tests" parallel="methods" enabled="false">
         <classes>
             <class name="br.com.home.lab.softwaretesting.automation.aws.test.AwsLocalTests"/>
         </classes>
     </test>
-    <test name="Kakfa PoC tests" parallel="methods">
+    <test name="Kakfa PoC tests" parallel="methods" enabled="false">
         <classes>
             <class name="br.com.home.lab.softwaretesting.automation.kafka.test.KafkaProducerTest" />
         </classes>

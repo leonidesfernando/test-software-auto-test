@@ -6,6 +6,7 @@ import br.com.home.lab.softwaretesting.automation.selenium.webdriver.components.
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject.EntriesListPage;
 import br.com.home.lab.softwaretesting.automation.util.StringUtil;
+import br.com.home.lab.softwaretesting.automation.util.Util;
 import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
 
@@ -155,8 +156,8 @@ public class EntriesListAction extends BaseAction<EntriesListPage>{
 
     @Step("Checking the successful entry registry message")
     public boolean checkSuccessfulEntryRegistyMessage(){
-        final String message = page.getAlert().getText().toLowerCase();
-        return  message.contains("success") || message.contains("sucesso");
+        final String message = page.getAlert().getText();
+        return message.equals(Util.getMessageByKey("entry.added"));
     }
 
     @Override
