@@ -5,9 +5,9 @@ target/
 .allure
 
 ### JMeter reports ###
-src/test/jmeter/report*
-src/test/jmeter/reportResult.jtl
-src/test/jmeter/jmeter.log
+/src/test/resources/jmeter/report*
+/src/test/resources/jmeter/reportResult.jtl
+/src/test/resources/jmeter/jmeter.log
 
 test-output
 ### STS ###

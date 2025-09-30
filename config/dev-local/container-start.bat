@@ -1,0 +1,1 @@
+docker compose -f dev-local-compose.yml --env-file=.env -p aws-dev-local-test-software up -d
