@@ -6,24 +6,25 @@ import br.com.home.lab.softwaretesting.automation.model.User;
 import org.aeonbits.owner.ConfigFactory;
 import org.testng.util.Strings;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 public final class LoadConfigurationUtil {
 
     private static final String API_URL = "api.url";
     private static final String APP_URL = "app.url";
+    private static final String LANGUAGE = "language";
     private static final Configurations config = ConfigFactory.create(Configurations.class);
-    private static final Map<String, Map<String, String>> secrets = new ConcurrentHashMap<>();
+    private static final ThreadLocal<Map<String, Map<String, String>>> secrets = ThreadLocal.withInitial(HashMap::new);
 
     private LoadConfigurationUtil(){}
 
     public static Map<String, String> getSecretsDbCredentials(){
 
         String secretName = config.awsSecretsManagerDbCredentials();
-        return secrets.computeIfAbsent(secretName, key ->
+        return secrets.get().computeIfAbsent(secretName, key ->
             SecretsManagerUtil.getSecretKeyValue(secretName)
         );
     }
@@ -62,6 +63,9 @@ public final class LoadConfigurationUtil {
     }
 
     public static String getLanguage(){
+        if(Strings.isNotNullAndNotEmpty(System.getProperty(LANGUAGE))){
+            return System.getProperty(LANGUAGE);
+        }
         return Optional.ofNullable(config.language()).orElse("BR");
     }
 }

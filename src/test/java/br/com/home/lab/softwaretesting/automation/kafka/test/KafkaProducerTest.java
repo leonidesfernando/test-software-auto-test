@@ -5,12 +5,16 @@ import br.com.home.lab.softwaretesting.automation.kafka.KafkaMessageProducer;
 import br.com.home.lab.softwaretesting.automation.model.Entry;
 import br.com.home.lab.softwaretesting.automation.util.EntryDataUtil;
 import br.com.home.lab.softwaretesting.automation.util.JsonUtils;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class KafkaProducerTest {
 
@@ -31,8 +35,12 @@ public class KafkaProducerTest {
 
     @Test(dependsOnMethods = {"kafkaProducerOneMessageTest"}, priority = 2)
     public void kafkaConsumerOneMessageTest() {
-        await().atMost(20, TimeUnit.SECONDS)
-                .until(() -> consumer.consumeMessage() != null);
+        String receivedMessage = await().atMost(20, TimeUnit.SECONDS)
+                .until(consumer::consumeMessage, notNullValue());
+        assertThat(receivedMessage)
+                .as("Received message should not be empty")
+                .isNotEmpty()
+                .isNotNull();
     }
 
     @Test
@@ -40,7 +48,15 @@ public class KafkaProducerTest {
         for(int i = 0; i < 10; i++) {
             kafkaProducerOneMessageTest();
         }
-        await().atMost(20, TimeUnit.SECONDS)
-                .until(() -> consumer.consumeMessages().size() >= 10);
+
+        List<ConsumerRecord<String, String>> receivedMessages = await().atMost(20, TimeUnit.SECONDS)
+                .until(() -> {
+                    var messages = consumer.consumeMessages();
+                    return messages.size() >= 10 ? messages : null;
+                }, notNullValue());
+        assertThat(receivedMessages)
+                .as("Received messages should be at least 10")
+                .isNotEmpty()
+                .hasSizeGreaterThanOrEqualTo(10);
     }
 }

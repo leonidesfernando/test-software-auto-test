@@ -4,16 +4,16 @@
         <listener class-name="br.com.home.lab.softwaretesting.automation.selenium.webdriver.config.ScreenshotListener"/>
     </listeners>
 
-    <test name="E2E Tests - Need the app running" thread-count="5" parallel="methods" enabled="false" >
+    <test name="E2E Tests - Need the app running" thread-count="5" parallel="methods" enabled="false">
         <classes>
             <class name="br.com.home.lab.softwaretesting.automation.cucumber.testrunner.TestRunnerManager"/>
 
         </classes>
     </test>
-    <test name="E2E Selenium tests">
+    <test name="E2E Selenium tests" enabled="false">
         <classes>
             <class name="br.com.home.lab.softwaretesting.automation.selenium.webdriver.test.EntriesTest" />
-            <!-- class name="br.com.home.lab.softwaretesting.automation.restassured.ControllerTest"/ -->
+            <class name="br.com.home.lab.softwaretesting.automation.restassured.ControllerTest"/>
         </classes>
     </test>
     <test name="Localstack PoC tests" parallel="methods" enabled="false">
@@ -24,6 +24,11 @@
     <test name="Kakfa PoC tests" parallel="methods" enabled="false">
         <classes>
             <class name="br.com.home.lab.softwaretesting.automation.kafka.test.KafkaProducerTest" />
+        </classes>
+    </test>
+    <test name="JDBI PoC tests" parallel="methods">
+        <classes>
+            <class name="br.com.home.lab.softwaretesting.automation.jdbi.test.JdbiTest" />
         </classes>
     </test>
 </suite>

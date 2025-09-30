@@ -89,6 +89,11 @@
 			<groupId>software.amazon.awssdk</groupId>
 			<artifactId>secretsmanager</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>cloudwatchlogs</artifactId>
+		</dependency>
+
 		<!-- AWS end -->
 
 		<!-- Kafka start -->

@@ -57,7 +57,7 @@ services:
     ports:
       - "4566:4566" # gateway and external services port
     environment:
-      - SERVICES=s3,logs,lambda,iam, secretsmanager
+      - SERVICES=s3,logs,lambda,iam, secretsmanager,logs,cloudwatch
       - DEBUG=1
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}

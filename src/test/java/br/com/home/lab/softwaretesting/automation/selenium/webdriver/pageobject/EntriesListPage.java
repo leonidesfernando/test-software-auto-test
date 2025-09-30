@@ -45,7 +45,7 @@ public class EntriesListPage extends BasePage {
     @FindBy(id = "homeLink")
     private WebElement homeLink;
 
-    @FindBy(xpath = "//div[@class]/span")
+    @FindBy(css = "div[class] span")
     private WebElement alert;
     
     private static final String LIST_TABLE_ID = "divTabelaLancamentos";

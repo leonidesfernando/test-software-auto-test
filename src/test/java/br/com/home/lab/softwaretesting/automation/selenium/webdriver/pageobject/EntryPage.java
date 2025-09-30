@@ -12,13 +12,13 @@ import org.openqa.selenium.support.ui.Select;
 
 public class EntryPage extends BasePage {
 
-    @CacheLookup @FindBy(xpath = "//*/label[@for='INCOME']")
+    @CacheLookup @FindBy(css = "label[for='INCOME']")
     private WebElement income;
 
-    @CacheLookup @FindBy(xpath = "//*/label[@for='EXPENSE']")
+    @CacheLookup @FindBy(css = "label[for='EXPENSE']")
     private WebElement expense;
 
-    @CacheLookup @FindBy(xpath = "//*/label[@for='TRANSF']")
+    @CacheLookup @FindBy(css = "label[for='TRANSF']")
     private WebElement transf;
 
     @CacheLookup @Getter @FindBy(id = "description")

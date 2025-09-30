@@ -73,7 +73,11 @@ public abstract class BaseSeleniumTest {
 
     @Step("Asking the browser to access the URL loaded from LoadConfigurationUtil")
     protected void access() {
-        getWebDriver().get(LoadConfigurationUtil.getAppUrl());
+        try {
+            getWebDriver().get(LoadConfigurationUtil.getAppUrl());
+        } catch (RuntimeException e) {
+            throw new IllegalStateException(String.format("Fail to access %s check if the app is alive and your internet connection", LoadConfigurationUtil.getAppUrl()),e);
+        }
     }
 
     @Step("Closing the browser")
