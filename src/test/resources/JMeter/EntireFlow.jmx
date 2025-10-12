@@ -2,12 +2,12 @@
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
   <hashTree>
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan">
+      <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
       <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
         <collectionProp name="Arguments.arguments"/>
       </elementProp>
       <boolProp name="TestPlan.functional_mode">false</boolProp>
-      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
     </TestPlan>
     <hashTree>
       <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config">
@@ -19,7 +19,7 @@
         <boolProp name="recycle">true</boolProp>
         <stringProp name="shareMode">shareMode.all</stringProp>
         <boolProp name="stopThread">false</boolProp>
-        <stringProp name="variableNames">user,password,TIMER_RANDOM_DELAY_MAXIMUM,TIMER_CONSTANT_DELAY_OFFSET,NUSERS,TIME</stringProp>
+        <stringProp name="variableNames">TIMER_RANDOM_DELAY_MAXIMUM,TIMER_CONSTANT_DELAY_OFFSET,NUSERS,ULT_TG_STARTUP_TIME,ULT_TG_HOLD_LOAD_TIME,ULT_TG_SHUTDOWN_TIME,BASE_DIR,PROTOCOL,URL,PORT,ADMIN_USER,ADMIN_PASSWORD</stringProp>
       </CSVDataSet>
       <hashTree/>
       <CacheManager guiclass="CacheManagerGui" testclass="CacheManager" testname="HTTP Cache Manager" enabled="true">
@@ -28,12 +28,6 @@
         <boolProp name="CacheManager.controlledByThread">false</boolProp>
         <intProp name="maxSize">50</intProp>
       </CacheManager>
-      <hashTree/>
-      <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager" enabled="true">
-        <collectionProp name="CookieManager.cookies"/>
-        <boolProp name="CookieManager.clearEachIteration">false</boolProp>
-        <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
-      </CookieManager>
       <hashTree/>
       <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager - JSON Content Type" enabled="true">
         <collectionProp name="HeaderManager.headers">
@@ -44,17 +38,22 @@
         </collectionProp>
       </HeaderManager>
       <hashTree/>
-      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
-        <stringProp name="HTTPSampler.domain">localhost</stringProp>
-        <stringProp name="HTTPSampler.port">8080</stringProp>
-        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
-          <collectionProp name="Arguments.arguments"/>
-        </elementProp>
-        <stringProp name="HTTPSampler.implementation"></stringProp>
-      </ConfigTestElement>
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV Data Set Config - USERS" enabled="true">
+        <stringProp name="delimiter">,</stringProp>
+        <stringProp name="fileEncoding"></stringProp>
+        <stringProp name="filename">/config/users.data.csv</stringProp>
+        <boolProp name="ignoreFirstLine">true</boolProp>
+        <boolProp name="quotedData">false</boolProp>
+        <boolProp name="recycle">true</boolProp>
+        <stringProp name="shareMode">shareMode.all</stringProp>
+        <boolProp name="stopThread">false</boolProp>
+        <stringProp name="variableNames">name,username,password,email</stringProp>
+      </CSVDataSet>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group" enabled="false">
-        <intProp name="ThreadGroup.num_threads">1</intProp>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group SETUP - Create Users - IF needed">
+        <stringProp name="TestPlan.comments">If the users does not exists into the DB. If the there are users, keep disabled</stringProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+        <intProp name="ThreadGroup.num_threads">4</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
@@ -64,14 +63,17 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Global Uniform Random Timer" enabled="true">
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Global Uniform Random Timer">
           <stringProp name="ConstantTimer.delay">${TIMER_CONSTANT_DELAY_OFFSET}</stringProp>
           <stringProp name="RandomTimer.range">${TIMER_RANDOM_DELAY_MAXIMUM}</stringProp>
         </UniformRandomTimer>
         <hashTree/>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="01_Login Controller Transaction" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="01_SETUP_Login as AdminController Transaction"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - Login" enabled="true">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - SETUP- Login as Admin">
+            <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
             <stringProp name="HTTPSampler.path">/api/auth/signin</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -83,8 +85,8 @@
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.value">{&#xd;
-    &quot;username&quot;: &quot;${user}&quot;,&#xd;
-    &quot;password&quot;: &quot;${password}&quot;&#xd;
+    &quot;username&quot;: &quot;${ADMIN_USER}&quot;,&#xd;
+    &quot;password&quot;: &quot;${ADMIN_PASSWORD}&quot;&#xd;
 }&#xd;
 </stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
@@ -93,13 +95,36 @@
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - TOKEN" enabled="true">
+            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor SETUP - TOKEN" enabled="true">
               <stringProp name="JSONPostProcessor.referenceNames">token</stringProp>
               <stringProp name="JSONPostProcessor.jsonPathExprs">$.token</stringProp>
               <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
             </JSONPostProcessor>
             <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion - Token validation" enabled="true">
+            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor SETUP - LOGGED USER" enabled="true">
+              <stringProp name="JSONPostProcessor.referenceNames">userId</stringProp>
+              <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
+              <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+            </JSONPostProcessor>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion SETUP - User ID validation" enabled="true">
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">String userId = vars.get(&quot;userId&quot;)
+
+if (userId == null || userId.isEmpty() || userId == &quot;&quot;) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;User ID was not extracted. Value: &quot; + userId)
+} else if (Long.valueOf(userId).longValue() &lt;= 0 ) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Extracted token does not appear to be a valid ID: &quot; + userId)
+}
+</stringProp>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223Assertion>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion SETUP - Token validation" enabled="true">
               <stringProp name="cacheKey">true</stringProp>
               <stringProp name="filename"></stringProp>
               <stringProp name="parameters"></stringProp>
@@ -116,7 +141,7 @@ if (token == null || token.isEmpty() || token == &quot;NOT_FOUND&quot;) {
               <stringProp name="scriptLanguage">groovy</stringProp>
             </JSR223Assertion>
             <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion - Login Success" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion SETUP - Login Success" enabled="true">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="49586">200</stringProp>
               </collectionProp>
@@ -137,10 +162,13 @@ if (token == null || token.isEmpty() || token == &quot;NOT_FOUND&quot;) {
           </collectionProp>
         </HeaderManager>
         <hashTree/>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="02_Search - Listing entries Controller Transaction" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="01_SETUP_Find User Controller Transaction"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - Listing entries" enabled="true">
-            <stringProp name="HTTPSampler.path">/api/entries/search</stringProp>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - SETUP - Find User By Admin">
+            <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
+            <stringProp name="HTTPSampler.path">/api/auth/findUserByAdmin</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -151,46 +179,101 @@ if (token == null || token.isEmpty() || token == &quot;NOT_FOUND&quot;) {
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.value">{&#xd;
-	&quot;searchItem&quot;:&quot;&quot;,&#xd;
-	&quot;searchOnlyCurrentMonth&quot;:true,&#xd;
-	&quot;itemBusca&quot;:&quot;&quot;&#xd;
-}</stringProp>
+	&quot;email&quot;: &quot;${email}&quot;&#xd;
+}&#xd;
+</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                 </elementProp>
               </collectionProp>
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion - Search Response Validation" enabled="true">
-              <stringProp name="scriptLanguage">groovy</stringProp>
-              <stringProp name="parameters"></stringProp>
-              <stringProp name="filename"></stringProp>
+            <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor - SETUP - Find User" enabled="true">
               <stringProp name="cacheKey">true</stringProp>
-              <stringProp name="script">import groovy.json.JsonSlurper
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">// Capture response code from the previous sampler
+def code = prev.getResponseCode()
+vars.put(&quot;find_user_response_code&quot;, code)
 
-def responseBody = prev.getResponseDataAsString()
-def json = new JsonSlurper().parseText(responseBody)
 
-if (!json.entries || json.entries.size() == 0) {
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;No entries found in response.&quot;)
+/*import java.nio.file.*
+import java.nio.charset.StandardCharsets
+
+	String userID = vars.get(&quot;userID&quot;)
+	
+	Path path = Paths.get(&quot;C:/Users/fernando/dados/git-source/test-software-auto-test/src/test/resources/JMeter&quot;, &quot;config&quot;, &quot;user.ids.csv&quot;)
+
+	//Path path = Paths.get(vars.get(${{BASE_DIR}}), &quot;config&quot;, &quot;user.ids.csv&quot;)
+        
+	log.info(&quot;\n\nWriting user ID to: &quot; + path + &quot; the ID: &quot; + userID)
+	//System.out.println(&quot;Writing user ID to: &quot; + path)
+	//String header = &quot;userID&quot; + System.lineSeparator()
+	//Files.write(path, header.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+
+    
+synchronized(this) {
+    Files.write(path, 
+        (userID + System.lineSeparator()).getBytes(StandardCharsets.UTF_8),
+        StandardOpenOption.CREATE,
+        StandardOpenOption.APPEND
+    )
 }
-
-// Get the status code of the previous sampler
-int statusCode = prev.getResponseCode() as int
-
-// Define allowed response codes
-def expectedCodes = [200]
-
-// Fail if the status code is not one of the expected
-if (!expectedCodes.contains(statusCode)) {
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Expected status code(s): ${expectedCodes}, but got: ${statusCode}&quot;)
-}
+*/
 </stringProp>
-            </JSR223Assertion>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223PostProcessor>
             <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion - Search Success" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion - SETUP - Find USER Success" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+                <stringProp name="51512">404</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">true</boolProp>
+              <intProp name="Assertion.test_type">40</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <IfController guiclass="IfControllerPanel" testclass="IfController" testname="If Controller - SETUP" enabled="true">
+          <stringProp name="IfController.condition">${__groovy(&quot;${find_user_response_code}&quot; == &quot;404&quot;)}</stringProp>
+          <boolProp name="IfController.evaluateAll">false</boolProp>
+          <boolProp name="IfController.useExpression">true</boolProp>
+        </IfController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - SETUP - Create User" enabled="true">
+            <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
+            <stringProp name="HTTPSampler.path">/api/auth/signup</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.BROWSER_COMPATIBLE_MULTIPART">true</boolProp>
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+	&quot;name&quot;: &quot;${name}&quot;,&#xd;
+	&quot;username&quot;: &quot;${username}&quot;,&#xd;
+	&quot;password&quot;: &quot;${password}&quot;,&#xd;
+	&quot;email&quot;: &quot;${email}&quot;,&#xd;
+	&quot;roles&quot;: [&#xd;
+        &quot;user&quot;&#xd;
+    ]&#xd;
+}&#xd;
+</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion - SETUP - Create USER Success" enabled="true">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="49586">200</stringProp>
               </collectionProp>
@@ -202,108 +285,23 @@ if (!expectedCodes.contains(statusCode)) {
             <hashTree/>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="ADD - New Entry Controller" enabled="true"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="03_POST - SETUP FINISHED -  Logout Admin Controller Transaction" enabled="true"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - ADD New Entry" enabled="true">
-            <stringProp name="HTTPSampler.path">/api/entries/add</stringProp>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - SETUP FINISHED - POST Logout Admin" enabled="true">
+            <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
+            <stringProp name="HTTPSampler.path">/api/auth/signout</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
             <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-            <boolProp name="HTTPSampler.BROWSER_COMPATIBLE_MULTIPART">true</boolProp>
-            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-              <collectionProp name="Arguments.arguments">
-                <elementProp name="" elementType="HTTPArgument">
-                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">{&#xd;
-    &quot;category&quot;: &quot;${category}&quot;,&#xd;
-    &quot;amount&quot;: &quot;${amount}&quot;,&#xd;
-    &quot;description&quot;: &quot;${description}&quot;,&#xd;
-    &quot;entryDate&quot;: &quot;${entryDate}&quot;,&#xd;
-    &quot;entryType&quot;: &quot;${entryType}&quot;&#xd;
-}&#xd;
-</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-              </collectionProp>
+            <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+              <collectionProp name="Arguments.arguments"/>
             </elementProp>
           </HTTPSamplerProxy>
           <hashTree>
-            <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="JSR223 PreProcessor" enabled="true">
-              <stringProp name="scriptLanguage">groovy</stringProp>
-              <stringProp name="parameters"></stringProp>
-              <stringProp name="filename"></stringProp>
-              <stringProp name="cacheKey">true</stringProp>
-              <stringProp name="script">import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Random
-
-Random rand = new Random()
-
-// Current date info
-LocalDate now = LocalDate.now()
-int month = now.getMonthValue()
-int day = rand.nextInt((month == 2) ? 27 : 30) + 1
-int year = now.getYear()
-
-// Format date
-String date = String.format(&quot;%02d/%02d/%d&quot;, day, month, year)
-vars.put(&quot;entryDate&quot;, date)
-
-// Entry types
-String[] types = [&quot;EXPENSE&quot;, &quot;INCOME&quot;, &quot;TRANSF&quot;]
-String entryType = types[rand.nextInt(types.length)]
-vars.put(&quot;entryType&quot;, entryType)
-
-// Categories
-String[] categories = [&quot;FOOD&quot;,&quot;WAGE&quot;,&quot;LEISURE&quot;,&quot;PHONE_INTERNET&quot;,&quot;CAR&quot;,&quot;LOAN&quot;,&quot;INVESTMENTS&quot;,&quot;CLOTHING&quot;,&quot;OTHER&quot;]
-String category = categories[rand.nextInt(categories.length)]
-vars.put(&quot;category&quot;, category)
-
-// Description (you can replace this with a CSV or static string for random words)
-vars.put(&quot;description&quot;, &quot;JMeter &quot; + rand.nextInt(9999))
-
-// Random price with comma
-double rawPrice = (rand.nextInt(901) + 100) / 10.0  // 10.0–100.0
-String price = String.format(Locale.US, &quot;%.2f&quot;, rawPrice).replace(&quot;.&quot;, &quot;,&quot;)
-vars.put(&quot;amount&quot;, price)
-</stringProp>
-            </JSR223PreProcessor>
-            <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion" enabled="true">
-              <stringProp name="scriptLanguage">groovy</stringProp>
-              <stringProp name="parameters"></stringProp>
-              <stringProp name="filename"></stringProp>
-              <stringProp name="cacheKey">true</stringProp>
-              <stringProp name="script">import groovy.json.JsonSlurper
-
-def response = prev.getResponseDataAsString()
-
-try {
-    def json = new JsonSlurper().parseText(response)
-
-    // Check &quot;message&quot;
-    if (json.message != &apos;entry.added&apos;) {
-        AssertionResult.setFailure(true)
-        AssertionResult.setFailureMessage(&quot;Expected message &apos;entry.added&apos; but got &apos;${json.message}&apos;&quot;)
-        return
-    }
-
-    // Check &quot;id&quot;
-    if (!(json.id instanceof Number) || json.id &lt;= 0) {
-        AssertionResult.setFailure(true)
-        AssertionResult.setFailureMessage(&quot;Expected positive numeric id but got &apos;${json.id}&apos;&quot;)
-        return
-    }
-
-} catch (Exception e) {
-    AssertionResult.setFailure(true)
-    AssertionResult.setFailureMessage(&quot;Failed to parse JSON response: &quot; + e.message)
-}
-</stringProp>
-            </JSR223Assertion>
-            <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion - Add Entry Success" enabled="true">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion - SETUP FINISHED - POST Logout Admin Success" enabled="true">
               <collectionProp name="Asserion.test_strings">
                 <stringProp name="49586">200</stringProp>
               </collectionProp>
@@ -316,63 +314,50 @@ try {
           </hashTree>
         </hashTree>
       </hashTree>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
-        <boolProp name="ResultCollector.error_logging">false</boolProp>
-        <objProp>
-          <name>saveConfig</name>
-          <value class="SampleSaveConfiguration">
-            <time>true</time>
-            <latency>true</latency>
-            <timestamp>true</timestamp>
-            <success>true</success>
-            <label>true</label>
-            <code>true</code>
-            <message>true</message>
-            <threadName>true</threadName>
-            <dataType>true</dataType>
-            <encoding>false</encoding>
-            <assertions>true</assertions>
-            <subresults>true</subresults>
-            <responseData>false</responseData>
-            <samplerData>false</samplerData>
-            <xml>false</xml>
-            <fieldNames>true</fieldNames>
-            <responseHeaders>false</responseHeaders>
-            <requestHeaders>false</requestHeaders>
-            <responseDataOnError>false</responseDataOnError>
-            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-            <assertionsResultsToSave>0</assertionsResultsToSave>
-            <bytes>true</bytes>
-            <sentBytes>true</sentBytes>
-            <url>true</url>
-            <threadCounts>true</threadCounts>
-            <idleTime>true</idleTime>
-            <connectTime>true</connectTime>
-          </value>
-        </objProp>
-        <stringProp name="filename"></stringProp>
-      </ResultCollector>
-      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group - WAIT" enabled="true">
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <ConstantTimer guiclass="ConstantTimerGui" testclass="ConstantTimer" testname="Constant Timer" enabled="true">
+          <stringProp name="ConstantTimer.delay">400</stringProp>
+        </ConstantTimer>
+        <hashTree/>
+      </hashTree>
       <kg.apc.jmeter.threads.UltimateThreadGroup guiclass="kg.apc.jmeter.threads.UltimateThreadGroupGui" testclass="kg.apc.jmeter.threads.UltimateThreadGroup" testname="jp@gc - Ultimate Thread Group" enabled="true">
         <collectionProp name="ultimatethreadgroupdata">
-          <collectionProp name="-1482930749">
-            <stringProp name="1689244546">${__P(nUser1,3)}</stringProp>
-            <stringProp name="-2055952069">${__P(initialDelay1,0)}</stringProp>
-            <stringProp name="-18535836">${__P(startupTime,10)}</stringProp>
-            <stringProp name="-1917450302">${__P(holdLoad1,10)}</stringProp>
+          <collectionProp name="-1921700639">
+            <stringProp name="1689245507">${__P(nUser1,4)}</stringProp>
+            <stringProp name="-2055951108">${__P(initialDelay1,1)}</stringProp>
+            <stringProp name="-831882060">${__P(startupTime,1)}</stringProp>
+            <stringProp name="-1585874026">${__P(holdLoad1,1)}</stringProp>
             <stringProp name="0"></stringProp>
           </collectionProp>
-          <collectionProp name="1710805647">
-            <stringProp name="1690168067">${__P(nUser2,3)}</stringProp>
-            <stringProp name="718658491">${__P(initialDelay2,10)}</stringProp>
-            <stringProp name="-18535836">${__P(startupTime,10)}</stringProp>
-            <stringProp name="-1888791360">${__P(holdLoad2,20)}</stringProp>
+          <collectionProp name="169330339">
+            <stringProp name="1690169028">${__P(nUser2,4)}</stringProp>
+            <stringProp name="-2055026626">${__P(initialDelay2,2)}</stringProp>
+            <stringProp name="-831879177">${__P(startupTime,4)}</stringProp>
+            <stringProp name="-1888821151">${__P(holdLoad2,10)}</stringProp>
             <stringProp name="0"></stringProp>
           </collectionProp>
-          <collectionProp name="1256523516">
-            <stringProp name="1690168067">${__P(nUser2,3)}</stringProp>
-            <stringProp name="747317433">${__P(initialDelay3,20)}</stringProp>
-            <stringProp name="-18535836">${__P(startupTime,10)}</stringProp>
+          <collectionProp name="860168425">
+            <stringProp name="1691092549">${__P(nUser3,4)}</stringProp>
+            <stringProp name="-2054102144">${__P(initialDelay3,3)}</stringProp>
+            <stringProp name="-831875333">${__P(startupTime,8)}</stringProp>
+            <stringProp name="-1860162209">${__P(holdLoad3,20)}</stringProp>
+            <stringProp name="0"></stringProp>
+          </collectionProp>
+          <collectionProp name="-649868010">
+            <stringProp name="1692016070">${__P(nUser4,4)}</stringProp>
+            <stringProp name="-2053177662">${__P(initialDelay4,4)}</stringProp>
+            <stringProp name="-18533914">${__P(startupTime,12)}</stringProp>
             <stringProp name="-1860132418">${__P(holdLoad3,30)}</stringProp>
             <stringProp name="0"></stringProp>
           </collectionProp>
@@ -392,6 +377,9 @@ try {
         <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="01_Login Controller Transaction" enabled="true"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - Login" enabled="true">
+            <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
             <stringProp name="HTTPSampler.path">/api/auth/signin</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -403,7 +391,7 @@ try {
                 <elementProp name="" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
                   <stringProp name="Argument.value">{&#xd;
-    &quot;username&quot;: &quot;${user}&quot;,&#xd;
+    &quot;username&quot;: &quot;${username}&quot;,&#xd;
     &quot;password&quot;: &quot;${password}&quot;&#xd;
 }&#xd;
 </stringProp>
@@ -418,6 +406,29 @@ try {
               <stringProp name="JSONPostProcessor.jsonPathExprs">$.token</stringProp>
               <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
             </JSONPostProcessor>
+            <hashTree/>
+            <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - LOGGED USER" enabled="true">
+              <stringProp name="JSONPostProcessor.referenceNames">userId</stringProp>
+              <stringProp name="JSONPostProcessor.jsonPathExprs">$.id</stringProp>
+              <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
+            </JSONPostProcessor>
+            <hashTree/>
+            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion - User ID validation" enabled="true">
+              <stringProp name="cacheKey">true</stringProp>
+              <stringProp name="filename"></stringProp>
+              <stringProp name="parameters"></stringProp>
+              <stringProp name="script">String userId = vars.get(&quot;userId&quot;)
+
+if (userId == null || userId.isEmpty() || userId == &quot;&quot;) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;User ID was not extracted. Value: &quot; + userId)
+} else if (Long.valueOf(userId).longValue() &lt;= 0 ) {
+    AssertionResult.setFailure(true)
+    AssertionResult.setFailureMessage(&quot;Extracted token does not appear to be a valid ID: &quot; + userId)
+}
+</stringProp>
+              <stringProp name="scriptLanguage">groovy</stringProp>
+            </JSR223Assertion>
             <hashTree/>
             <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion - Token validation" enabled="true">
               <stringProp name="cacheKey">true</stringProp>
@@ -457,9 +468,12 @@ if (token == null || token.isEmpty() || token == &quot;NOT_FOUND&quot;) {
           </collectionProp>
         </HeaderManager>
         <hashTree/>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="02_ADD - New Entry Controller Transaction"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="02_ADD - New Entry Controller Transaction" enabled="true"/>
         <hashTree>
           <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - ADD New Entry" enabled="true">
+            <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
             <stringProp name="HTTPSampler.path">/api/entries/add</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -475,7 +489,8 @@ if (token == null || token.isEmpty() || token == &quot;NOT_FOUND&quot;) {
     &quot;amount&quot;: &quot;${amount}&quot;,&#xd;
     &quot;description&quot;: &quot;${description}&quot;,&#xd;
     &quot;entryDate&quot;: &quot;${entryDate}&quot;,&#xd;
-    &quot;entryType&quot;: &quot;${entryType}&quot;&#xd;
+    &quot;entryType&quot;: &quot;${entryType}&quot;,&#xd;
+    &quot;userId&quot;: &quot;${userId}&quot;&#xd;
 }&#xd;
 </stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
@@ -576,7 +591,7 @@ try {
             <hashTree/>
           </hashTree>
         </hashTree>
-        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller CRUD operations">
+        <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller CRUD operations" enabled="true">
           <stringProp name="LoopController.loops">3</stringProp>
         </LoopController>
         <hashTree>
@@ -591,9 +606,12 @@ try {
             </FloatProperty>
           </ThroughputController>
           <hashTree>
-            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="03_Search - Listing entries Controller Transaction"/>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="03_Search - Listing entries Controller Transaction" enabled="true"/>
             <hashTree>
               <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - Listing entries" enabled="true">
+                <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+                <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+                <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
                 <stringProp name="HTTPSampler.path">/api/entries/search</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -607,7 +625,8 @@ try {
                       <stringProp name="Argument.value">{&#xd;
 	&quot;searchItem&quot;:&quot;&quot;,&#xd;
 	&quot;searchOnlyCurrentMonth&quot;:true,&#xd;
-	&quot;itemBusca&quot;:&quot;&quot;&#xd;
+	&quot;itemBusca&quot;:&quot;&quot;,&#xd;
+	 &quot;userId&quot;: &quot;${userId}&quot;&#xd;
 }</stringProp>
                       <stringProp name="Argument.metadata">=</stringProp>
                     </elementProp>
@@ -656,9 +675,12 @@ if (!expectedCodes.contains(statusCode)) {
                 <hashTree/>
               </hashTree>
             </hashTree>
-            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="04_GET added entry Controller Transaction"/>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="04_GET added entry Controller Transaction" enabled="true"/>
             <hashTree>
               <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request GET added entry" enabled="true">
+                <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+                <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+                <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
                 <stringProp name="HTTPSampler.path">/api/entries/get/${id}</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">GET</stringProp>
@@ -710,7 +732,7 @@ requiredFields.each { key -&gt;
               </hashTree>
             </hashTree>
           </hashTree>
-          <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="45% Throughput Controller - Transaction - PUT">
+          <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="45% Throughput Controller - Transaction - PUT" enabled="true">
             <intProp name="ThroughputController.style">1</intProp>
             <boolProp name="ThroughputController.perThread">false</boolProp>
             <intProp name="ThroughputController.maxThroughput">1</intProp>
@@ -721,9 +743,12 @@ requiredFields.each { key -&gt;
             </FloatProperty>
           </ThroughputController>
           <hashTree>
-            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="05_PUT - Editing Entry Controller Transaction"/>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="05_PUT - Editing Entry Controller Transaction" enabled="true"/>
             <hashTree>
               <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - PUT Editing Entry" enabled="true">
+                <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+                <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+                <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
                 <stringProp name="HTTPSampler.path">/api/entries/update</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">PUT</stringProp>
@@ -740,7 +765,8 @@ requiredFields.each { key -&gt;
      &quot;amount&quot;: &quot;${amount}&quot;,&#xd;
      &quot;description&quot;: &quot;${description} - Edited&quot;,&#xd;
      &quot;entryDate&quot;: &quot;${entryDate}&quot;,&#xd;
-     &quot;entryType&quot;: &quot;${entryType}&quot;&#xd;
+     &quot;entryType&quot;: &quot;${entryType}&quot;,&#xd;
+     &quot;userId&quot;: &quot;${userId}&quot;&#xd;
 }&#xd;
 </stringProp>
                       <stringProp name="Argument.metadata">=</stringProp>
@@ -844,9 +870,12 @@ try {
             </FloatProperty>
           </ThroughputController>
           <hashTree>
-            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="06_DELETE -  Controller Transaction"/>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="06_DELETE -  Controller Transaction" enabled="true"/>
             <hashTree>
               <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - DELETE entry" enabled="true">
+                <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+                <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+                <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
                 <stringProp name="HTTPSampler.path">/api/entries/remove/${id}</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">DELETE</stringProp>
@@ -902,9 +931,12 @@ try {
                 <hashTree/>
               </hashTree>
             </hashTree>
-            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="07_ADD - New Entry Controller Transaction"/>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="07_ADD - New Entry Controller Transaction" enabled="true"/>
             <hashTree>
               <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - ADD New Entry" enabled="true">
+                <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+                <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+                <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
                 <stringProp name="HTTPSampler.path">/api/entries/add</stringProp>
                 <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
                 <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -920,7 +952,8 @@ try {
     &quot;amount&quot;: &quot;${amount}&quot;,&#xd;
     &quot;description&quot;: &quot;${description}&quot;,&#xd;
     &quot;entryDate&quot;: &quot;${entryDate}&quot;,&#xd;
-    &quot;entryType&quot;: &quot;${entryType}&quot;&#xd;
+    &quot;entryType&quot;: &quot;${entryType}&quot;,&#xd;
+    &quot;userId&quot;: &quot;${userId}&quot;&#xd;
 }&#xd;
 </stringProp>
                       <stringProp name="Argument.metadata">=</stringProp>
@@ -1023,9 +1056,12 @@ try {
             </hashTree>
           </hashTree>
         </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="08_POST Logout Controller Transaction"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="08_POST Logout Controller Transaction" enabled="true"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request POST Logout">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request POST Logout" enabled="true">
+            <stringProp name="HTTPSampler.domain">${URL}</stringProp>
+            <stringProp name="HTTPSampler.port">${PORT}</stringProp>
+            <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
             <stringProp name="HTTPSampler.path">/api/auth/signout</stringProp>
             <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
             <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -1046,74 +1082,46 @@ try {
               <intProp name="Assertion.test_type">8</intProp>
             </ResponseAssertion>
             <hashTree/>
-            <JSR223Assertion guiclass="TestBeanGUI" testclass="JSR223Assertion" testname="JSR223 Assertion - Entry is not NULL" enabled="false">
-              <stringProp name="scriptLanguage">groovy</stringProp>
-              <stringProp name="parameters"></stringProp>
-              <stringProp name="filename"></stringProp>
-              <stringProp name="cacheKey">true</stringProp>
-              <stringProp name="script">import groovy.json.JsonSlurper
-
-// Parse the JSON response
-def response = prev.getResponseDataAsString()
-def json = new JsonSlurper().parseText(response)
-
-// Required fields to validate
-def requiredFields = [&apos;id&apos;, &apos;description&apos;, &apos;amount&apos;, &apos;entryDate&apos;, &apos;entryType&apos;, &apos;category&apos;]
-
-// Assert each field exists and is not null or blank (for strings)
-requiredFields.each { key -&gt;
-    assert json.containsKey(key) : &quot;Missing field: &apos;$key&apos;&quot;
-    def value = json[key]
-    assert value != null : &quot;Field &apos;$key&apos; is null&quot;
-    
-    // Additional check for strings
-    if (value instanceof String) {
-        assert value.trim() : &quot;Field &apos;$key&apos; is blank&quot;
-    }
-}
-</stringProp>
-            </JSR223Assertion>
-            <hashTree/>
           </hashTree>
         </hashTree>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
-          <boolProp name="ResultCollector.error_logging">false</boolProp>
-          <objProp>
-            <name>saveConfig</name>
-            <value class="SampleSaveConfiguration">
-              <time>true</time>
-              <latency>true</latency>
-              <timestamp>true</timestamp>
-              <success>true</success>
-              <label>true</label>
-              <code>true</code>
-              <message>true</message>
-              <threadName>true</threadName>
-              <dataType>true</dataType>
-              <encoding>false</encoding>
-              <assertions>true</assertions>
-              <subresults>true</subresults>
-              <responseData>false</responseData>
-              <samplerData>false</samplerData>
-              <xml>false</xml>
-              <fieldNames>true</fieldNames>
-              <responseHeaders>false</responseHeaders>
-              <requestHeaders>false</requestHeaders>
-              <responseDataOnError>false</responseDataOnError>
-              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
-              <assertionsResultsToSave>0</assertionsResultsToSave>
-              <bytes>true</bytes>
-              <sentBytes>true</sentBytes>
-              <url>true</url>
-              <threadCounts>true</threadCounts>
-              <idleTime>true</idleTime>
-              <connectTime>true</connectTime>
-            </value>
-          </objProp>
-          <stringProp name="filename"></stringProp>
-        </ResultCollector>
-        <hashTree/>
       </hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
     </hashTree>
   </hashTree>
 </jmeterTestPlan>
