@@ -50,7 +50,7 @@
         <stringProp name="variableNames">name,username,password,email</stringProp>
       </CSVDataSet>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group SETUP - Create Users - IF needed">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group SETUP - Create Users - IF needed" enabled="true">
         <stringProp name="TestPlan.comments">If the users does not exists into the DB. If the there are users, keep disabled</stringProp>
         <boolProp name="ThreadGroup.delayedStart">true</boolProp>
         <intProp name="ThreadGroup.num_threads">4</intProp>
@@ -63,14 +63,14 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Global Uniform Random Timer">
+        <UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Global Uniform Random Timer" enabled="true">
           <stringProp name="ConstantTimer.delay">${TIMER_CONSTANT_DELAY_OFFSET}</stringProp>
           <stringProp name="RandomTimer.range">${TIMER_RANDOM_DELAY_MAXIMUM}</stringProp>
         </UniformRandomTimer>
         <hashTree/>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="01_SETUP_Login as AdminController Transaction"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="01_SETUP_Login as AdminController Transaction" enabled="true"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - SETUP- Login as Admin">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - SETUP- Login as Admin" enabled="true">
             <stringProp name="HTTPSampler.domain">${URL}</stringProp>
             <stringProp name="HTTPSampler.port">${PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
@@ -162,9 +162,9 @@ if (token == null || token.isEmpty() || token == &quot;NOT_FOUND&quot;) {
           </collectionProp>
         </HeaderManager>
         <hashTree/>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="01_SETUP_Find User Controller Transaction"/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="01_SETUP_Find User Controller Transaction" enabled="true"/>
         <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - SETUP - Find User By Admin">
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - SETUP - Find User By Admin" enabled="true">
             <stringProp name="HTTPSampler.domain">${URL}</stringProp>
             <stringProp name="HTTPSampler.port">${PORT}</stringProp>
             <stringProp name="HTTPSampler.protocol">${PROTOCOL}</stringProp>
