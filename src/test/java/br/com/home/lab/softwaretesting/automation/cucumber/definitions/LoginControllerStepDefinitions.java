@@ -1,6 +1,7 @@
 package br.com.home.lab.softwaretesting.automation.cucumber.definitions;
 
 import br.com.home.lab.softwaretesting.automation.model.User;
+import br.com.home.lab.softwaretesting.automation.model.record.LoginApiResponse;
 import br.com.home.lab.softwaretesting.automation.model.record.LoginCredentialRecord;
 import br.com.home.lab.softwaretesting.automation.restassured.RestAssurredUtil;
 import br.com.home.lab.softwaretesting.automation.util.LoadConfigurationUtil;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static br.com.home.lab.softwaretesting.automation.util.Constants.LOGIN_ENDPOINT;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -27,8 +29,9 @@ public class LoginControllerStepDefinitions {
     public void the_following_credentials_then(List<LoginCredentialRecord> credentials){
 
         for (LoginCredentialRecord credential : credentials) {
-            String token =  RestAssurredUtil.doLogin(getUserByCredential(credential), LOGIN_ENDPOINT);
-            Assert.assertTrue(Strings.isNotNullAndNotEmpty(token));
+            LoginApiResponse loginApiResponse =  RestAssurredUtil.doLogin(getUserByCredential(credential), LOGIN_ENDPOINT);
+            Assert.assertTrue(Strings.isNotNullAndNotEmpty(loginApiResponse.token()));
+            assertThat(loginApiResponse.id()).isGreaterThan(0);
         }
     }
 
@@ -79,6 +82,7 @@ public class LoginControllerStepDefinitions {
 
     private User getUserByCredential(LoginCredentialRecord credential){
         return new User(
+                user.name(),
                 getUserByType(credential.typeUser()),
                 getPasswordByType(credential.typePassword())
         );
