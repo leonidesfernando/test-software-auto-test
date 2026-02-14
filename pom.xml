@@ -21,8 +21,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<webdrivermanager.version>5.9.2</webdrivermanager.version>
-		<selenium.version>4.29.0</selenium.version>
+		<webdrivermanager.version>6.3.3</webdrivermanager.version>
+		<selenium.version>4.38.0</selenium.version>
 		<lombok.version>1.18.36</lombok.version>
 		<cucumber.version>7.21.0</cucumber.version>
 		<argLine>-Xms256m -Xmx1524m -XX:MaxPermSize=256m -Duser.language=en</argLine>
@@ -43,6 +43,7 @@
 		<extentreports-version>5.0.9</extentreports-version>
 		<aspectj.version>1.9.22.1</aspectj.version>
 		<ashot.version>1.5.4</ashot.version>
+        <fastexcel.version>0.19.0</fastexcel.version>
 		<allure.version>2.29.0</allure.version>
 		<allure.cmd.download.url>
 			https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline
@@ -164,6 +165,12 @@
 			<version>${lombok.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel</artifactId>
+            <version>0.19.0</version>
+        </dependency>
+
 		<!-- Selenium and webdriver manager -->
 		<dependency>
 			<groupId>io.github.bonigarcia</groupId>
@@ -243,6 +250,12 @@
 			<artifactId>rest-assured</artifactId>
 			<version>${rest-assured.version}</version>
 			<scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-lang3</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -257,7 +270,12 @@
 			<artifactId>datafaker</artifactId>
 			<version>${java.faker}</version>
 		</dependency>
-
+        <dependency>
+            <groupId>org.dhatim</groupId>
+            <artifactId>fastexcel-reader</artifactId>
+            <version>${fastexcel.version}</version>
+            <scope>test</scope> <!-- Only needed for tests -->
+        </dependency>
 		<!-- properties -->
 		<dependency>
 			<groupId>org.aeonbits.owner</groupId>
@@ -292,6 +310,12 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>2.0.16</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
