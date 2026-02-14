@@ -20,11 +20,23 @@ public interface Configurations extends Config {
 
     Browser browser();
 
+    String nameUser();
+
     String username();
 
     String password();
 
     String language();
+
+    @Key("cucumber.name.user")
+    String cucumberNameUser();
+
+    @Key("cucumber.username")
+    String cucumberUser();
+
+    @Key("cucumber.password")
+    String cucumberPassword();
+
 
     /*
      * AWS configuration

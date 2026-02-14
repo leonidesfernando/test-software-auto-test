@@ -27,14 +27,14 @@ public enum EntryDataTableValues {
         @Override
         public String value() {
             MoneyToStringConverter converter = new MoneyToStringConverter();
-            return converter.convert(BigDecimal.valueOf(DataGen.moneyValue())
+            return converter.convert(DataGen.amount()
                     .setScale(2, RoundingMode.HALF_UP));
         }
     };
 
     private final String dataType;
 
-    abstract public String value();
+    abstract String value();
 
     public static EntryDataTableValues from(String value) {
 

@@ -22,6 +22,7 @@ Feature:Validate the CRUD of expense and revenue entries
     And Search an entry by category "TRANSF"
 
 
+
   Scenario: Edit the first found entry
     Given Register entry whit provided data
       | description | amount      | entryDate         | entryType | category    |
@@ -35,3 +36,22 @@ Feature:Validate the CRUD of expense and revenue entries
       | Roupa       | @MoneyValue | @AnyDate  | EXPENSE   | CLOTHING |
     Given Search an entry by category "EXPENSE"
     And Remove the first entry found
+
+  Scenario: Add new entries and export entries to a file excel
+    Given Register entry whit provided data
+      | description             | amount      | entryDate         | entryType | category    |
+      | Cucumber - car repair   | @MoneyValue | @DateCurrentMonth | EXPENSE   | CAR         |
+      | Cucumber - Bonus Salary | 942.02      | @DateCurrentMonth | INCOME    | WAGE        |
+      | Cucumber - Bonus Salary | 1892.02     | @DateCurrentMonth | TRANSF    | INVESTMENTS |
+    Then Export entries to excel file and validate
+
+
+  Scenario: Remove all entries and validate export with no entries
+    Given Register entry whit provided data
+      | description             | amount      | entryDate         | entryType | category        |
+      | Cucumber - internet     | @MoneyValue | @DateCurrentMonth | EXPENSE   | PHONE_INTERNET  |
+      | Cucumber - Bonus Salary | 942.02      | @DateCurrentMonth | INCOME    | WAGE            |
+      | Cucumber - Bonus Salary | 1892.02     | @DateCurrentMonth | TRANSF    | INVESTMENTS     |
+    Given Remove all entries
+    And No entries must be found to the logged user
+    Then Export entries to excel file and no entries must be found in the exported file

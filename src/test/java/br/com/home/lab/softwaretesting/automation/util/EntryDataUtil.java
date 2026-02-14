@@ -4,7 +4,6 @@ import br.com.home.lab.softwaretesting.automation.model.Category;
 import br.com.home.lab.softwaretesting.automation.model.Entry;
 import br.com.home.lab.softwaretesting.automation.model.EntryType;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.StringJoiner;
 
@@ -24,7 +23,7 @@ public final class EntryDataUtil {
 
         return new Entry.EntryBuilder()
                 .description(description)
-                .amount(BigDecimal.valueOf(DataGen.moneyValue()))
+                .amount(DataGen.amount())
                 .entryType(entryTypes[DataGen.number(0, entryTypes.length-1)])
                 .entryDate(DataGen.dateCurrentMonth())
                 .category(categories[DataGen.number(0, categories.length-1)])
@@ -39,6 +38,7 @@ public final class EntryDataUtil {
                 .entryDate(entry.getEntryDate())
                 .entryType(entry.getEntryType())
                 .category(entry.getCategory())
+                .userId(entry.getUserId())
                 .build();
     }
 }
