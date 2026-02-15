@@ -1,6 +1,7 @@
 package br.com.home.lab.softwaretesting.automation.restassured;
 
 import br.com.home.lab.softwaretesting.automation.model.User;
+import br.com.home.lab.softwaretesting.automation.model.record.LoginApiResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,24 +11,35 @@ import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.tuple.Pair;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
+import org.testng.internal.collections.Pair;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
+@Slf4j
 public final class RestAssurredUtil {
+
+    public static final String downloadDir;
+
+    static{
+        try {
+            downloadDir = Files.createTempDirectory("restassured-downloads").toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     record Credentials(String username, String password){}
 
-    record LoginApiResponse(String token, String type, int id, String username, String email, List<String> roles){}
-
-    public static String doLogin(User user, String endPoint){
-        LoginApiResponse apiResponse = callLogin(user, endPoint)
+    public static LoginApiResponse doLogin(User user, String endPoint){
+        return callLogin(user, endPoint)
                 .getBody().as(LoginApiResponse.class);
-        return apiResponse.token;
     }
 
     private static Response callLogin(User user, String endPoint){
@@ -59,10 +71,16 @@ public final class RestAssurredUtil {
                 .delete(endpoint);
     }
 
+    public static Response delete(String token, String endpoint, Object body) {
+        return baseRequest(token)
+                .body(body)
+                .delete(endpoint);
+    }
+
 
     public static Response get(String token, List<Pair<String, String>> params, String endPoint) {
         RequestSpecification specification = baseRequest(token);
-        params.forEach(p -> specification.pathParam(p.getLeft(), p.getRight()));
+        params.forEach(p -> specification.pathParam(p.first(), p.second()));
         return specification.get(endPoint);
     }
 
