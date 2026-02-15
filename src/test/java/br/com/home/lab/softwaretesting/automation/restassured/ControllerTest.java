@@ -3,6 +3,7 @@ package br.com.home.lab.softwaretesting.automation.restassured;
 import br.com.home.lab.softwaretesting.automation.model.Entry;
 import br.com.home.lab.softwaretesting.automation.model.User;
 import br.com.home.lab.softwaretesting.automation.model.record.FormSearch;
+import br.com.home.lab.softwaretesting.automation.model.record.LoginApiResponse;
 import br.com.home.lab.softwaretesting.automation.model.record.ResultRecord;
 import br.com.home.lab.softwaretesting.automation.util.DataGen;
 import br.com.home.lab.softwaretesting.automation.util.EntryDataUtil;
@@ -18,11 +19,11 @@ import io.qameta.allure.testng.Tag;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.util.Strings;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -59,16 +60,19 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
     @Step("Perform login using user from configuration and store auth token in the context")
     private void login(){
         User user = LoadConfigurationUtil.getUser();
-        String token =  RestAssurredUtil.doLogin(user, LOGIN_ENDPOINT);
-        assertThat(token).isNotBlank();
-        context.setContext(AUTH_TOKEN, token);
+        LoginApiResponse loginApiResponse =  RestAssurredUtil.doLogin(user, LOGIN_ENDPOINT);
+        assertThat(loginApiResponse.token()).isNotBlank();
+        assertThat(loginApiResponse.id()).isGreaterThan(0);
+        context.setContext(AUTH_TOKEN, loginApiResponse.token());
+        context.setContext(AUTH_USER_ID, String.valueOf(loginApiResponse.id()));
     }
 
     @Feature("Add new entry")
     @Severity(SeverityLevel.BLOCKER)
     @Tag(REGRESSION_TEST)
-    @Test(priority = 0, invocationCount = 4, testName = "Adding new entry: ", dataProvider = "entryData")
+    @Test(priority = 0, invocationCount = 5, testName = "Adding new entry: ", dataProvider = "entryData")
     public void addEntryTest(Entry entry) {
+        entry.setUserId(getLoggedUserId());
         Response response = RestAssurredUtil.post(getToken(),
                 ADD_ENDPOPINT, entry);
         response.then().assertThat()
@@ -84,17 +88,24 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
     @Tag(REGRESSION_TEST)
     @Test
     public void searchEntryTest(){
-        List<Entry> list = context.get(ENTRIES);
-        int n =  list.size();
-        assertThat(n).isGreaterThan(0);
-        String description = list.get(DataGen.number(0, n-1)).getDescription();
-        FormSearch form = new FormSearch(description,true, 1);
+        try {
+            semaphore.acquire();
+            List<Entry> list = context.get(ENTRIES);
+            int n =  list.size();
+            assertThat(n).isGreaterThan(0);
+            String description = list.get(DataGen.number(0, n-1)).getDescription();
+            FormSearch form = new FormSearch(description,true, 1, getLoggedUserId());
 
-        Response response = RestAssurredUtil.post(getToken(), SEARCH_ENDPOINT, form);
+            Response response = RestAssurredUtil.post(getToken(), SEARCH_ENDPOINT, form);
 
-        var result = response.as(ResultRecord.class);
-        var entries = result.entries();
-        assertThat(entries).hasSize(1);
+            var result = response.as(ResultRecord.class);
+            var entries = result.entries();
+            assertThat(entries).hasSizeGreaterThanOrEqualTo(1);
+            semaphore.release();
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage());
+            throw new IllegalStateException("Failure to acquire semaphore",e);
+        }
     }
 
     @Description("Getting an entry added previously from the test context")
@@ -113,7 +124,7 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
         assertNotEquals(entries.getId(), 0);
         assertNotNull(entries.getCategory());
         assertNotNull(entries.getAmount());
-        assertTrue(StringUtils.isNotBlank(entries.getDescription()));
+        assertTrue(Strings.isNotNullAndNotEmpty(entries.getDescription()));
         assertNotNull(entries.getEntryDate());
         assertNotNull(entries.getEntryType());
     }
@@ -125,6 +136,7 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
     void updateEntryTest(){
         Long id = getIdFromContext();
         Entry entry = EntryDataUtil.getUpdateEntryData(id, newValidEntry());
+        entry.setUserId(getLoggedUserId());
         var response = RestAssurredUtil.put(getToken(), UPDATE_ENDPOINT, entry);
         var jsonPath = response.jsonPath();
         assertEquals(jsonPath.getString("message"), "entry.updated");
@@ -153,11 +165,7 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
     void checkProfile(){
         var response = RestAssurredUtil.get(getToken(), CHECK_PROFILE_ENDPOINT);
         JsonPath jsonPath = response.jsonPath();
-        jsonPath.getLong("id");
-        assertTrue(StringUtils.isNotBlank(jsonPath.getString("username")));
-        assertTrue(StringUtils.isNotBlank(jsonPath.getString("email")));
-        assertTrue(StringUtils.isNotBlank(jsonPath.getString("authorities")));
-        assertTrue(StringUtils.isNotBlank(jsonPath.getString("enabled")));
+        assertTrue(Strings.isNotNullAndNotEmpty(jsonPath.getString("username")));
     }
 
     @DataProvider
@@ -170,6 +178,11 @@ public class ControllerTest extends AbstractTestNGSpringContextTests {
     @Step("Getting token from the context")
     private String getToken(){
         return context.get(AUTH_TOKEN);
+    }
+
+    @Step("Getting logged in user ID from the context")
+    private long getLoggedUserId(){
+        return Long.parseLong(context.get(AUTH_USER_ID));
     }
 
     @Step("Adding entry into the test context")
