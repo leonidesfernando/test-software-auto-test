@@ -81,6 +81,9 @@ echo ---------------------------------------------------------------------------
 echo.
 
 echo EXAMPLES:
+echo.
+echo runAndGenerateReports.bat 500 600
+echo.
 echo   - **Capacity:** runPerformanceTest capacity 500 600       (500 users for 10 minutes)
 echo   - **Response Time:** runPerformanceTest response 80 300   (80 users for 5 minutes)
 echo   - **Load:** runPerformanceTest load 150 900               (150 users for 15 minutes)
