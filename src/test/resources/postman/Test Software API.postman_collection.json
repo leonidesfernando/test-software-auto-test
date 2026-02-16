@@ -438,7 +438,7 @@
 									"\r",
 									"// pick -up category\r",
 									"const categories = [\"FOOD\",\"WAGE\",\"LEISURE\",\"PHONE_INTERNET\",\"CAR\",\r",
-									"                    \"LOAN\",\"INVESTIMENTS\", \"CLOTHING\",\"OTHER\"];\r",
+									"                    \"LOAN\",\"INVESTMENTS\", \"CLOTHING\",\"OTHER\"];\r",
 									"const categoryIindex = _.random(0, categories.length-1);\r",
 									"pm.environment.set(\"pre_category\", categories[categoryIindex]);\r",
 									"\r",
@@ -454,7 +454,8 @@
 									"pm.environment.set(\"pre_price\", price);"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						},
 						{
@@ -473,7 +474,8 @@
 									"pm.environment.set(\"entryId\", jsonData.id);"
 								],
 								"type": "text/javascript",
-								"packages": {}
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -488,7 +490,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"category\": \"{{pre_category}}\",\r\n    \"amount\": \"{{pre_price}}\",\r\n    \"description\": \"{{pre_description}}\",\r\n    \"entryDate\": \"{{pre_dataLancamento}}\",\r\n    \"entryType\": \"{{pre_tipoLancamento}}\"\r\n}",
+							"raw": "{\r\n    \"category\": \"{{pre_category}}\",\r\n    \"amount\": \"{{pre_price}}\",\r\n    \"description\": \"{{pre_description}}\",\r\n    \"entryDate\": \"{{pre_dataLancamento}}\",\r\n    \"entryType\": \"{{pre_tipoLancamento}}\",\r\n    \"userId\": \"{{userId}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -586,7 +588,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"category\": \"{{pre_category}}\",\r\n    \"amount\": \"{{pre_price}}\",\r\n    \"description\": \"{{pre_description}}\",\r\n    \"entryDate\": \"{{pre_dataLancamento}}\",\r\n    \"entryType\": \"{{pre_tipoLancamento}}\"\r\n}",
+							"raw": "{\r\n    \"category\": \"{{pre_category}}\",\r\n    \"amount\": \"{{pre_price}}\",\r\n    \"description\": \"{{pre_description}}\",\r\n    \"entryDate\": \"{{pre_dataLancamento}}\",\r\n    \"entryType\": \"{{pre_tipoLancamento}}\",\r\n    \"userId\": \"{{userId}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -733,7 +735,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"category\": \"{{pre_category}}\",\r\n    \"amount\": \"{{pre_price}}\",\r\n    \"description\": \"{{pre_description}}\",\r\n    \"entryDate\": \"{{pre_dataLancamento}}\",\r\n    \"entryType\": \"{{pre_tipoLancamento}}\"\r\n}",
+							"raw": "{\r\n    \"category\": \"{{pre_category}}\",\r\n    \"amount\": \"{{pre_price}}\",\r\n    \"description\": \"{{pre_description}}\",\r\n    \"entryDate\": \"{{pre_dataLancamento}}\",\r\n    \"entryType\": \"{{pre_tipoLancamento}}\",\r\n    \"userId\": \"{{userId}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -828,7 +830,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"category\": \"{{pre_category}}\",\r\n    \"amount\": \"{{pre_price}}\",\r\n    \"description\": \"{{pre_description}}\",\r\n    \"entryDate\": \"{{pre_dataLancamento}}\",\r\n    \"entryType\": \"{{pre_tipoLancamento}}\",\r\n    \"id\": {{entryUpdateId}}\r\n}",
+							"raw": "{\r\n    \"category\": \"{{pre_category}}\",\r\n    \"amount\": \"{{pre_price}}\",\r\n    \"description\": \"{{pre_description}}\",\r\n    \"entryDate\": \"{{pre_dataLancamento}}\",\r\n    \"entryType\": \"{{pre_tipoLancamento}}\",\r\n    \"id\": {{entryUpdateId}},\r\n    \"userId\": \"{{userId}}\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -850,7 +852,7 @@
 					"response": []
 				},
 				{
-					"name": "API - DELETE /api/entries/remove/1",
+					"name": "API - DELETE /api/entries/remove/",
 					"event": [
 						{
 							"listen": "test",
@@ -914,7 +916,8 @@
 							""
 						],
 						"type": "text/javascript",
-						"packages": {}
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
@@ -929,7 +932,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"searchItem\": \"post\",\r\n    \"searchOnlyCurrentMonth\": true,\r\n    \"page\": 0\r\n}",
+					"raw": "{\r\n    \"searchItem\": \"play\",\r\n    \"searchOnlyCurrentMonth\": true,\r\n    \"page\": 0,\r\n    \"userId\": \"{{userId}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -951,7 +954,7 @@
 			"response": []
 		},
 		{
-			"name": "API - POST /api/auth/signup - DISABLED",
+			"name": "Add User - API - POST /api/auth/signup",
 			"event": [
 				{
 					"listen": "test",
@@ -973,7 +976,8 @@
 							"})"
 						],
 						"type": "text/javascript",
-						"packages": {}
+						"packages": {},
+						"requests": {}
 					}
 				},
 				{
@@ -983,16 +987,82 @@
 							""
 						],
 						"type": "text/javascript",
-						"packages": {}
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
 			"request": {
-				"method": "PATCH",
+				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"zole\",\r\n    \"email\": \"zole@mail.com\",\r\n    \"password\": \"a\",\r\n    \"roles\": [\r\n        \"user\"\r\n    ]\r\n}",
+					"raw": "{\r\n    \"name\": \"User\",\r\n    \"username\": \"user\",\r\n    \"email\": \"user@mail.com\",\r\n    \"password\": \"a\",\r\n    \"roles\": [\r\n        \"user\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/signup",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ADD USERS- API - POST /api/auth/signup Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();\r",
+							"/* **** Disabled - method should be POST\r",
+							"pm.test(\"Signup status code is 200\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validating response body\", () => {\r",
+							"  pm.expect(jsonData.message).to.be.eq(\"user.registered.successfully\");\r",
+							"});\r",
+							"*/\r",
+							"\r",
+							"pm.test(\"Disabled signup status code is 405/401\", () => {\r",
+							"  pm.expect(jsonData.status > 400);\r",
+							"})"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{csv_name}}\",\r\n    \"username\": \"{{csv_username}}\",\r\n    \"email\": \"{{csv_email}}\",\r\n    \"password\": \"{{csv_password}}\",\r\n    \"roles\": [\r\n        \"user\"\r\n    ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1037,12 +1107,13 @@
 							"})"
 						],
 						"type": "text/javascript",
-						"packages": {}
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
 			"request": {
-				"method": "PATCH",
+				"method": "DELETE",
 				"header": [
 					{
 						"key": "Authorization",
@@ -1050,6 +1121,15 @@
 						"type": "text"
 					}
 				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": \"{{userId}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
 					"raw": "{{host}}/api/entries/removeAll",
 					"host": [
@@ -1080,11 +1160,13 @@
 							"  pm.expect(jsonData.token).to.be.not.null;\r",
 							"\r",
 							"  pm.environment.set(\"token\", jsonData.token);\r",
+							"  pm.environment.set(\"userId\", jsonData.id);\r",
 							"});\r",
 							""
 						],
 						"type": "text/javascript",
-						"packages": {}
+						"packages": {},
+						"requests": {}
 					}
 				}
 			],
@@ -1109,6 +1191,75 @@
 						"api",
 						"auth",
 						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "API - POST /api/auth/findUserByAdmin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData = pm.response.json();\r",
+							"pm.test(\"Signin status code is 200\", () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"/*pm.test(\"Validating response body\", () => {\r",
+							"  pm.expect(jsonData.token).to.be.not.null;\r",
+							"\r",
+							"  pm.environment.set(\"token\", jsonData.token);\r",
+							"  pm.environment.set(\"userId\", jsonData.id);\r",
+							"});*/\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{tokenAuthorization}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"joe1@mail.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/api/auth/findUserByAdmin",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"findUserByAdmin"
 					]
 				}
 			},
@@ -1459,6 +1610,7 @@
 			"script": {
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -1469,6 +1621,7 @@
 			"script": {
 				"type": "text/javascript",
 				"packages": {},
+				"requests": {},
 				"exec": [
 					""
 				]
@@ -1478,28 +1631,28 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "http://localhost:8080",
-			"type": "string"
+			"value": "http://localhost:8080"
 		},
 		{
 			"key": "user",
-			"value": "user",
-			"type": "string"
+			"value": "user"
 		},
 		{
 			"key": "password",
-			"value": "a",
-			"type": "string"
+			"value": "a"
 		},
 		{
 			"key": "tokenAuthorization",
-			"value": "Bearer {{token}}",
-			"type": "string"
+			"value": "Bearer {{token}}"
 		},
 		{
 			"key": "token",
-			"value": "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MjkwMDQyNzksImlhdCI6MTcyODkxNzg3OSwianRpIjoidXNlciIsInN1YiI6InVzZXIiLCJyb2xlcyI6IlJPTEVfQURNSU4ifQ.J8g8JBHQaNr9duGKMwUSEluRYh8ZADix0EqhS4QFUFU",
-			"type": "string"
+			"value": "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE3MjkwMDQyNzksImlhdCI6MTcyODkxNzg3OSwianRpIjoidXNlciIsInN1YiI6InVzZXIiLCJyb2xlcyI6IlJPTEVfQURNSU4ifQ.J8g8JBHQaNr9duGKMwUSEluRYh8ZADix0EqhS4QFUFU"
+		},
+		{
+			"key": "name",
+			"value": "",
+			"type": "default"
 		}
 	]
 }
