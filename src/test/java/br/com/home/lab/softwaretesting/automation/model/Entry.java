@@ -3,8 +3,10 @@ package br.com.home.lab.softwaretesting.automation.model;
 import br.com.home.lab.softwaretesting.automation.model.converter.CategoryDeserialize;
 import br.com.home.lab.softwaretesting.automation.model.converter.EntryTypeDeserialize;
 import br.com.home.lab.softwaretesting.automation.model.converter.MoneyDeserialize;
+import br.com.home.lab.softwaretesting.automation.model.converter.MoneySerialize;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -24,6 +26,7 @@ public class Entry {
     private String description;
 
     @JsonDeserialize(using = MoneyDeserialize.class)
+    @JsonSerialize(using = MoneySerialize.class)
     private BigDecimal amount;
 
     @JsonFormat(pattern = DD_MM_YYYY_SLASH)
@@ -35,6 +38,9 @@ public class Entry {
     @JsonDeserialize(using = CategoryDeserialize.class)
     private Category category;
 
+    @Setter
+    private long userId;
+
     public static class EntryBuilder{
         private long id;
         private String description;
@@ -42,6 +48,7 @@ public class Entry {
         private Date entryDate;
         private EntryType entryType;
         private Category category;
+        private long userId;
 
 
         public EntryBuilder description(String description){
@@ -68,8 +75,12 @@ public class Entry {
             this.id = id;
             return this;
         }
+        public EntryBuilder userId(long userId){
+            this.userId = userId;
+            return this;
+        }
         public Entry build(){
-            return new Entry(id,description,amount,entryDate,entryType,category);
+            return new Entry(id,description,amount,entryDate,entryType,category, userId);
         }
     }
 }

@@ -1,22 +1,22 @@
 package br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject;
 
+import br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil;
 import lombok.Getter;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 
 @Getter
 public class HomePage extends BasePage {
 
 
-    @FindBy(id = "logout")
-    private WebElement logoutLink;
+    private By logoutLinkBy = By.id("logout");
 
-    @FindBy(id = "BR")
-    private WebElement brLanguage;
+    private By brLanguageBy = By.id("BR");
 
-    @FindBy(id = "EN")
-    private WebElement enLanguage;
+    private By enLanguageBy = By.id("EN");
+
+    private By nameUser = By.cssSelector("span[qadata='nameUser']");
 
     public HomePage(WebDriver webDriver) {
         super(webDriver);
@@ -24,6 +24,19 @@ public class HomePage extends BasePage {
 
     @Override
     protected boolean isReady() {
-        return logoutLink.isEnabled();
+        return SeleniumUtil.findElementBy(getWebDriver(), logoutLinkBy).isEnabled();
+    }
+
+    public WebElement getLogoutLink() {
+        return SeleniumUtil.findElementBy(getWebDriver(), logoutLinkBy);
+    }
+    public WebElement getBrLanguage() {
+        return SeleniumUtil.findElementBy(getWebDriver(), brLanguageBy);
+    }
+    public WebElement getEnLanguage() {
+        return SeleniumUtil.findElementBy(getWebDriver(), enLanguageBy);
+    }
+    public WebElement getNameUserWebElement() {
+        return SeleniumUtil.findElementBy(getWebDriver(), nameUser);
     }
 }

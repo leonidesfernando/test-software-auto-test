@@ -21,6 +21,7 @@ public class LoginAction extends BaseAction<LoginPage> {
         page.submitUserCredentials(user);
         homeAction = new HomeAction(getWebDriver());
         footerAction = new FooterAction(getWebDriver());
+        homeAction.validateLoggedUserName(user.name());
         return checkIfIsLoggedIn(language);
     }
 

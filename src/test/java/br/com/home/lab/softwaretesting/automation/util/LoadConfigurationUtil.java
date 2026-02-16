@@ -59,7 +59,11 @@ public final class LoadConfigurationUtil {
     }
 
     public static User getUser() {
-        return new User(config.username(), config.password());
+        return new User(config.nameUser(), config.username(), config.password());
+    }
+
+    public static User getCucumberUser() {
+        return new User(config.cucumberNameUser(), config.cucumberUser(), config.cucumberPassword());
     }
 
     public static String getLanguage(){

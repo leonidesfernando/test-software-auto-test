@@ -84,7 +84,7 @@ public final class DataGen {
     private static LocalDate localDateByMonth(int month){
         int day = getDayByMonth(month);
         int year = getCurrentYear();
-        return LocalDate.of(year, month-1, day);
+        return LocalDate.of(year, month, day);
     }
 
 
@@ -103,11 +103,7 @@ public final class DataGen {
     }
 
     public static BigDecimal amount(){
-        return new BigDecimal(faker.commerce().price());
-    }
-
-    public static double moneyValue(){
-        return moneyValue(700);
+        return new BigDecimal(faker.commerce().price(150D,50000D));
     }
 
     public static double moneyValue(double max){
@@ -115,7 +111,7 @@ public final class DataGen {
     }
 
     public static int number(int max){
-        return getRandom().nextInt(0, max+1);
+        return getRandom().nextInt(1, max+1);
     }
 
     private static Random getRandom(){

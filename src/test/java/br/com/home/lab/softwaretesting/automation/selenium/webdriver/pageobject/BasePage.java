@@ -2,8 +2,6 @@ package br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject
 
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import org.openqa.selenium.support.ui.LoadableComponent;
 
 import java.util.Objects;
@@ -16,9 +14,6 @@ public abstract class BasePage extends LoadableComponent<BasePage> {
     public BasePage(WebDriver webDriver) {
         Objects.requireNonNull(webDriver);
         this.webDriver.set(webDriver);
-        PageFactory.initElements(
-                new AjaxElementLocatorFactory(getWebDriver(), 20),
-                this);
     }
 
     public WebDriver getWebDriver() {

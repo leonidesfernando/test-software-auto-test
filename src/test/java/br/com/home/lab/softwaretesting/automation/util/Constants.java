@@ -5,6 +5,7 @@ import java.util.Locale;
 public interface Constants {
 
     String AUTH_TOKEN = "authToken";
+    String AUTH_USER_ID = "authUserId";
 
     String DD_MM_YYYY_SLASH = "dd/MM/yyyy";
     String YYYY_MM_DD_SLASH = "yyyy/MM/dd";
@@ -28,10 +29,12 @@ public interface Constants {
     String LOGIN_ENDPOINT = "api/auth/signin";
     String ADD_ENDPOPINT = "/api/entries/add";
     String SEARCH_ENDPOINT = "/api/entries/search";
+    String EXPORT_EXCEL_ENDPOINT = "/api/entries/export";
     String GET_ENDPOINT = "/api/entries/get/%d";
     String UPDATE_ENDPOINT = "/api/entries/update";
     String REMOVE_ENDPOINT = "/api/entries/remove/%d";
     String CHECK_PROFILE_ENDPOINT = "/api/check/profile";
+    String REMOVE_ALL_ENDPOINT = "/api/entries/removeAll";
 
 
     String SMOKE_TEST = "Smoke";

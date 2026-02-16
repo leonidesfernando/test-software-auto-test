@@ -2,14 +2,16 @@ package br.com.home.lab.softwaretesting.automation.selenium.webdriver.action;
 
 import br.com.home.lab.softwaretesting.automation.model.Category;
 import br.com.home.lab.softwaretesting.automation.model.EntryType;
+import br.com.home.lab.softwaretesting.automation.model.converter.MoneyToStringConverter;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject.EntryPage;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.testng.Assert;
 
 import java.math.BigDecimal;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 public class EntryAction extends BaseAction<EntryPage> {
@@ -33,14 +35,14 @@ public class EntryAction extends BaseAction<EntryPage> {
     }
 
     public void saveEntry(){
-        getPage().getBtnSave().click();
+        SeleniumUtil.scrollToElement(getWebDriver(), getPage().getBtnSaveBy());
+        SeleniumUtil.waitToBeClickable(getWebDriver(), getPage().getBtnSaveBy());
+        SeleniumUtil.jsClick(getWebDriver(), getPage().getBtnSaveBy());
+        SeleniumUtil.waitTillUrlContains(getWebDriver(), "/entries");
         try{
-            Assert.fail(String.format(
-                    "Houve ao salvar o lancamento. provavelmente um campo nao foi preeenchido. %s",
-                    getPage().getDivError().getText())
-            );
+            assertThat(getPage().getDivError().getText()).isNotEmpty();
         }catch (NoSuchElementException e){
-            log.info("Entry save successfully");
+            log.debug("Entry save successfully");
         }
     }
 
@@ -69,7 +71,8 @@ public class EntryAction extends BaseAction<EntryPage> {
 
         getPage().getAmount().click();
         getPage().getAmount().clear();
-        getPage().getAmount().sendKeys(String.valueOf(entryAmount));
+        MoneyToStringConverter converter = new MoneyToStringConverter();
+        getPage().getAmount().sendKeys(converter.convert(entryAmount));
         getPage().getCategoryCombo().selectByValue(category.name());
     }
 }

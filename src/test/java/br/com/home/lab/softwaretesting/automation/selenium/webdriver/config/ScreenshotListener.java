@@ -1,6 +1,7 @@
 package br.com.home.lab.softwaretesting.automation.selenium.webdriver.config;
 
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.test.BaseSeleniumTest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Slf4j
 public class ScreenshotListener extends TestListenerAdapter {
 
 
@@ -21,12 +23,15 @@ public class ScreenshotListener extends TestListenerAdapter {
     public void onTestFailure(ITestResult result) {
         super.onTestFailure(result);
         if (!result.isSuccess() && result.getInstance() instanceof BaseSeleniumTest) {
+            final var methodName = result.getName();
+            log.info("Saving screenshot for test case: {}", methodName);
             WebDriver driver = getWebDriver((BaseSeleniumTest)result.getInstance());
             final String path = "/target/surefire-reports/";
-            final var methodName = result.getName();
+
             try {
                 File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
                 String reportDirectory = new File(System.getProperty("user.dir")).getAbsolutePath() + path;
+                log.info("Saving screenshot for test case: {} in {}", methodName, reportDirectory);
                 String className = result.getTestClass().getName();
                 className = className.substring(1 + className.lastIndexOf("."));
                 final String fileName = className + "_" + methodName + "_"

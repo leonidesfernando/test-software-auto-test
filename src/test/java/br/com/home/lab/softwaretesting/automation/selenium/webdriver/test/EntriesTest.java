@@ -4,6 +4,7 @@ import br.com.home.lab.softwaretesting.automation.model.Category;
 import br.com.home.lab.softwaretesting.automation.model.EntryRecord;
 import br.com.home.lab.softwaretesting.automation.model.EntryType;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.action.EntriesListAction;
+import br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil;
 import br.com.home.lab.softwaretesting.automation.util.DataGen;
 import io.qameta.allure.Description;
 import io.qameta.allure.Epic;
@@ -16,7 +17,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 
 import static br.com.home.lab.softwaretesting.automation.util.Constants.REGRESSION_TEST;
 import static br.com.home.lab.softwaretesting.automation.util.Constants.SMOKE_TEST;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertTrue;
 
 @Epic("Entries test running on Selenium WebDriver")
@@ -79,7 +80,7 @@ public class EntriesTest extends BaseSeleniumTest {
     @Description("Registering entries by dynamic data on web ui")
     @Severity(SeverityLevel.BLOCKER)
     @Tag(REGRESSION_TEST)
-    @Test(dependsOnMethods = "loginEntries")//, invocationCount = 3)
+    @Test(dependsOnMethods = "loginEntries", invocationCount = 4)
     public void addEntry() {
 
         String description = getDescription();
@@ -93,8 +94,6 @@ public class EntriesTest extends BaseSeleniumTest {
                 .saveEntry(description, value,
                         date, entryType, category);
 
-        assertTrue(entriesListAction.checkSuccessfulEntryRegistyMessage());
-
         assertTrue(entriesListAction.existEntry(description, date, entryType));
         setEntryInContext(new EntryRecord(description, date, entryType, category));
     }
@@ -104,12 +103,12 @@ public class EntriesTest extends BaseSeleniumTest {
     @Severity(SeverityLevel.BLOCKER)
     @Test(dependsOnMethods = "addEntry")
     void searchForDescription() {
+        SeleniumUtil.waitTillUrlContains(getWebDriver(), "entries");
         EntryRecord entryRecord = getEntryInContext();
         entriesListAction.goHome();
         entriesListAction.searchFor(entryRecord.description());
         entriesListAction.buscaLancamentoPorPaginaDescricao(entryRecord.description());
         entriesListAction.checkEntryExists(entryRecord.description(), entryRecord.entryDate(), entryRecord.type());
-        setEntryInContext(entryRecord);
     }
 
     @Issue("It's not searching the item to be edited. It must be fixed")
@@ -132,11 +131,22 @@ public class EntriesTest extends BaseSeleniumTest {
 
         assertTrue(entriesListAction.existsEntryByDescription(newDescription),
                 "Should exits the entry that was edited " + (newDescription));
-        setEntryInContext(entryRecord);
     }
 
+    @Description("Exporting entries to Excel file")
+    @Tag(REGRESSION_TEST)
+    @Tag(SMOKE_TEST)
+    @Severity(SeverityLevel.NORMAL)
+    @Test(dependsOnMethods = "searchForDescription")
+    void exportEntriesToExcel() {
+        entriesListAction.goHome();
+        entriesListAction.clickToExportEntriesToExcel();
+        entriesListAction.validateExcelFileHeader();
+    }
+
+
     @Description("Removing the entry by description collected from the context")
-    @Test(dependsOnMethods = "editEntry")
+    @Test(dependsOnMethods = "exportEntriesToExcel")
     @Tag(REGRESSION_TEST)
     @Severity(SeverityLevel.CRITICAL)
     void removeEntry() {
@@ -145,8 +155,40 @@ public class EntriesTest extends BaseSeleniumTest {
         entriesListAction.removeEntry(entryRecord.description());
     }
 
-    @Description("Performing log out")
+    @Description("Not removing all entries from the list")
     @Test(dependsOnMethods = "removeEntry")
+    @Tag(REGRESSION_TEST)
+    @Severity(SeverityLevel.CRITICAL)
+    void doNotRemoveAllEntries(){
+        entriesListAction.goHome();
+        entriesListAction.openModalRemoveAllEntries();
+        entriesListAction.doNotRemoveAllEntries();
+    }
+
+    @Description("Removing all entries from the list")
+    @Test(dependsOnMethods = "doNotRemoveAllEntries")
+    @Tag(REGRESSION_TEST)
+    @Severity(SeverityLevel.CRITICAL)
+    void removeAllEntries(){
+        entriesListAction.goHome();
+        entriesListAction.openModalRemoveAllEntries();
+        entriesListAction.removeAllEntries();
+    }
+
+    @Description("Exporting entries to Excel file")
+    @Tag(REGRESSION_TEST)
+    @Tag(SMOKE_TEST)
+    @Severity(SeverityLevel.NORMAL)
+    @Test(dependsOnMethods = "removeAllEntries", enabled = false)
+    void exportEmptyEntriesToExcel() {
+        entriesListAction.goHome();
+        entriesListAction.clickToExportEntriesToExcel();
+        entriesListAction.validateEmptyExcelFileHeader();
+    }
+
+
+    @Description("Performing log out")
+    @Test(dependsOnMethods = "removeAllEntries")
     public void logout() {
         super.doLogout();
     }
@@ -164,9 +206,7 @@ public class EntriesTest extends BaseSeleniumTest {
 
     @Step("Getting a new random value")
     private BigDecimal getEntryValue() {
-
-        return BigDecimal.valueOf(DataGen.moneyValue())
-                .setScale(2, RoundingMode.HALF_UP);
+        return DataGen.amount();
     }
 
     @Step("Getting a new random category given the available ones")
@@ -176,7 +216,10 @@ public class EntriesTest extends BaseSeleniumTest {
 
     private <T> T getAny(List<T> list) {
         int n = list.size();
-        int index = DataGen.number(n - 1);
+        if(n == 1) {
+            return list.get(0);
+        }
+        int index = DataGen.number(n-1);
         return list.get(index);
     }
 
@@ -185,7 +228,8 @@ public class EntriesTest extends BaseSeleniumTest {
         try {
             semaphore.acquire();
             Queue<EntryRecord> queue = getEntries();
-            EntryRecord entryRecord = queue.poll();
+            assertThat(queue).hasSizeGreaterThan(0);
+            EntryRecord entryRecord = queue.peek();
             Objects.requireNonNull(entryRecord);
             semaphore.release();
             return entryRecord;

@@ -20,7 +20,7 @@ public class MoneyDeserialize extends JsonDeserializer<BigDecimal> {
         List<String> values = List.of("", "R$");
         if (Objects.isNull(valorString) || values.contains(valorString)) return null;
 
-        valorString = valorString
+        valorString = valorString.split("\\.")[0]
                 .replaceAll("\\u00a0", "")
                 .replaceAll("\\s*", "")
                 .replaceAll("Â", "")

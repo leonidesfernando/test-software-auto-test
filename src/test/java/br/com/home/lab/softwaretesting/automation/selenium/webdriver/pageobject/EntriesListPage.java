@@ -3,55 +3,66 @@ package br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.components.GridUI;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil;
 import lombok.Getter;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.CacheLookup;
-import org.openqa.selenium.support.FindBy;
+
 
 @Getter
 public class EntriesListPage extends BasePage {
 
-    @FindBy(id = "novoLancamento")
-    private WebElement newEntry;
+    private By newEntryBy = By.id("novoLancamento");
 
-    @FindBy(id = "itemBusca")
-    private WebElement searchItem;
+    private By searchItemBy = By.id("itemBusca");
 
-    @FindBy(id = "bth-search")
-    private WebElement btnSearch;
+    private By btnSearchBy = By.id("bth-search");
 
-    @FindBy(css = "a[title='Dashboard']")
-    private WebElement btnDashboard;
+    private By btnDashboardBy = By.cssSelector("a[title='Dashboard']");
 
-    //@FindBy(id = "pagina1")
-    //private WebElement firstPaginationLink;
+    private By btnRemoveAllBy = By.cssSelector("button[data-bs-target='#modalRemoveAll']");
 
-    @CacheLookup
-    @FindBy(css = "button[data-bs-target='#modalRemoveAll']")
-    private WebElement btnRemoveAll;
+    private By homeLinkBy = By.id("homeLink");
 
-    @CacheLookup
-    @FindBy(id = "modalRemoveAll")
-    private WebElement modalRemoveAll;
+    private By alertBy = By.cssSelector("div.alert");
 
-    @CacheLookup
-    @FindBy(id = "btnYesRemoveAll")
-    private WebElement btnYesRemoveAll;
+    private By alertCloseButtonBy = By.cssSelector("#app > header > nav > div > div.container-fluid > div > div > button");
 
-    @CacheLookup
-    @FindBy(id = "overlayRemoveAll")
-    private WebElement waitRemoveAll;
-
-    @FindBy(id = "homeLink")
-    private WebElement homeLink;
-
-    @FindBy(css = "div[class] span")
-    private WebElement alert;
-    
-    private static final String LIST_TABLE_ID = "divTabelaLancamentos";
+    private By btnExportBy = By.id("bth-export");
 
     public EntriesListPage(final WebDriver driver) {
         super(driver);
+    }
+
+    public WebElement getNewEntry() {
+        return SeleniumUtil.findElementBy(getWebDriver(), newEntryBy);
+    }
+
+    public WebElement getSearchItem() {
+        return SeleniumUtil.findElementBy(getWebDriver(), searchItemBy);
+    }
+
+    public WebElement getBtnSearch() {
+        return SeleniumUtil.findElementBy(getWebDriver(), btnSearchBy);
+    }
+
+    public WebElement getBtnDashboard() {
+        return SeleniumUtil.findElementBy(getWebDriver(), btnDashboardBy);
+    }
+
+    public WebElement getBtnRemoveAll() {
+        return SeleniumUtil.findElementBy(getWebDriver(), btnRemoveAllBy);
+    }
+
+    public WebElement getHomeLink() {
+        return SeleniumUtil.findElementBy(getWebDriver(), homeLinkBy);
+    }
+
+    public WebElement getAlert() {
+        return SeleniumUtil.findElementBy(getWebDriver(), alertBy);
+    }
+
+    public WebElement getAlertCloseButton() {
+        return SeleniumUtil.findElementBy(getWebDriver(), alertCloseButtonBy);
     }
 
     public GridUI getGrid(){
@@ -60,7 +71,6 @@ public class EntriesListPage extends BasePage {
 
     @Override
     protected boolean isReady() {
-        return SeleniumUtil.waitForElementVisible(getWebDriver(), btnSearch).isEnabled()
-                && homeLink.isDisplayed() && homeLink.isEnabled();
+        return getBtnSearch().isDisplayed();
     }
 }

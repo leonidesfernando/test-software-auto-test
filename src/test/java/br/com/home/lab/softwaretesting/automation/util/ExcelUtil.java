@@ -1,5 +1,6 @@
 package br.com.home.lab.softwaretesting.automation.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.dhatim.fastexcel.reader.ReadableWorkbook;
 import org.dhatim.fastexcel.reader.Row;
 import org.dhatim.fastexcel.reader.Sheet;
@@ -7,12 +8,15 @@ import org.dhatim.fastexcel.reader.Sheet;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
+@Slf4j
 public final class ExcelUtil {
 
     private static final int REASONABLE_SIZE = 4_000;
@@ -67,17 +71,29 @@ public final class ExcelUtil {
 
 
     public static void validateExcelFileHeader(Path excelFile) {
-        try{
-            assertThat(excelFile).isNotNull();
-            assertThat(Files.size(excelFile)).isGreaterThan(REASONABLE_SIZE);
-            byte[] excelBytes = Files.readAllBytes(excelFile);
-            assertThat(excelBytes).hasSizeGreaterThan(REASONABLE_SIZE); // reasonable size
-            validateExcelFileHeader(excelBytes);
-        }catch (Exception e) {
-            throw new IllegalStateException("Fail to read excel file",e);
-        }finally {
-            if(excelFile!=null) {
-                excelFile.toFile().delete();
+        int retries = 3;
+        for(int i = 0; i <= retries; i++) {
+            try {
+                assertThat(excelFile).isNotNull();
+                assertThat(Files.size(excelFile)).isGreaterThan(REASONABLE_SIZE);
+                byte[] excelBytes = Files.readAllBytes(excelFile);
+                assertThat(excelBytes).hasSizeGreaterThan(REASONABLE_SIZE); // reasonable size
+                validateExcelFileHeader(excelBytes);
+                return;
+            }catch(NoSuchFileException noSuchFile){
+                log.warn("Excel file not found: {}", excelFile, noSuchFile);
+                log.warn("Retrying again, {}nd time, after a short delay...", (i+1));
+                try {
+                    Util.sleep(600); // Wait before retrying
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException("Fail to read excel file during the retrying",e);
+                }
+            }catch (Exception e) {
+                throw new IllegalStateException("Fail to read excel file",e);
+            }finally {
+                if(excelFile!=null) {
+                    excelFile.toFile().delete();
+                }
             }
         }
     }

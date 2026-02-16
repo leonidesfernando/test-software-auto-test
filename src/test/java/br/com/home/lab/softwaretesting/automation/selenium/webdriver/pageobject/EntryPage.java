@@ -1,40 +1,32 @@
 package br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject;
 
 import br.com.home.lab.softwaretesting.automation.model.EntryType;
+import br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil;
 import lombok.Getter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.CacheLookup;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
 
 
 public class EntryPage extends BasePage {
 
-    @CacheLookup @FindBy(css = "label[for='INCOME']")
-    private WebElement income;
+    private final By incomeBy = By.cssSelector("label[for='INCOME']");
 
-    @CacheLookup @FindBy(css = "label[for='EXPENSE']")
-    private WebElement expense;
+    private final By expenseBy = By.cssSelector("label[for='EXPENSE']");
 
-    @CacheLookup @FindBy(css = "label[for='TRANSF']")
-    private WebElement transf;
+    private final By transfBy = By.cssSelector("label[for='TRANSF']");
 
-    @CacheLookup @Getter @FindBy(id = "description")
-    private WebElement description;
+    private final By descriptionBy = By.id("description");
 
-    @CacheLookup @Getter @FindBy(name = "entryDate")
-    private WebElement entryDate;
+    private final By entryDateBy = By.name("entryDate");
 
-    @CacheLookup @Getter @FindBy(id = "amount")
-    private WebElement amount;
+    private final By amountBy = By.id("amount");
 
-    @CacheLookup @FindBy(id = "category")
-    private WebElement categoryWebElement;
+    private final By categoryBy = By.id("category");
 
-    @CacheLookup @Getter @FindBy(id = "btnSalvar")
-    private WebElement btnSave;
+    @Getter
+    private final By btnSaveBy = By.id("btnSalvar");
 
 
     public EntryPage(final WebDriver driver){
@@ -42,35 +34,61 @@ public class EntryPage extends BasePage {
     }
 
     public Select getCategoryCombo(){
-        return new Select(categoryWebElement);
+        return new Select(getCatetoryWebElement());
     }
 
     public WebElement getDivError(){
         return getWebDriver().findElement(By.cssSelector("div.alert.alert-danger"));
     }
 
+    public WebElement getCatetoryWebElement() {
+        return getWebDriver().findElement(categoryBy);
+    }
+
     public void setEntryType(EntryType entryType){
         switch (entryType){
             case EXPENSE -> {
-                expense.click();
-                expense.click();
+                getExpense().click();
+                getExpense().click();
             }
             case INCOME -> {
-                income.click();
-                income.click();
+                getIncome().click();
+                getIncome().click();
             }
             case TRANSF -> {
-                transf.click();
-                transf.click();
+                getTransf().click();
+                getTransf().click();
             }
         }
     }
 
     @Override
     protected boolean isReady() {
-        return income.isEnabled() &&
-                expense.isEnabled() &&
-                transf.isEnabled() &&
-                btnSave.isEnabled();
+        return getIncome().isEnabled() &&
+                getExpense().isEnabled() &&
+                getTransf().isEnabled() &&
+                getBtnSave().isEnabled();
+    }
+
+    public WebElement getIncome() {
+        return SeleniumUtil.findElementBy(getWebDriver(), incomeBy);
+    }
+    public WebElement getExpense() {
+        return SeleniumUtil.findElementBy(getWebDriver(), expenseBy);
+    }
+    public WebElement getTransf() {
+        return SeleniumUtil.findElementBy(getWebDriver(), transfBy);
+    }
+    public WebElement getBtnSave() {
+        return SeleniumUtil.findElementBy(getWebDriver(), btnSaveBy);
+    }
+    public WebElement getDescription() {
+        return SeleniumUtil.findElementBy(getWebDriver(), descriptionBy);
+    }
+    public WebElement getEntryDate() {
+        return SeleniumUtil.findElementBy(getWebDriver(), entryDateBy);
+    }
+    public WebElement getAmount() {
+        return SeleniumUtil.findElementBy(getWebDriver(), amountBy);
     }
 }

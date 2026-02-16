@@ -29,7 +29,7 @@ public abstract class BaseSeleniumTest {
 
     private final String language;
 
-    protected static final ScenarioContextData context = new ScenarioContextData();
+    protected final ScenarioContextData context = new ScenarioContextData();
 
     private User loggedUser;
     protected static final ThreadLocal<WebDriver> webDriver = new ThreadLocal<>();

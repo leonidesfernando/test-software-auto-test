@@ -18,6 +18,9 @@ public class FooterAction extends BaseAction<FooterPage> {
     }
 
     public void checkTitle(){
-        assertTrue(page.getTitle().getText().contains(Util.getMessageByKey("leonides.fernando.lab")));
+        final String footerText = page.getFooterTitle().getText();
+        final String expectedText = Util.getMessageByKey("leonides.fernando.lab");
+        assertTrue(footerText.contains(expectedText),
+                String.format("Footer title is incorrect. The title is: [%s] and the i18n key is: [%s]", footerText, expectedText));
     }
 }

@@ -1,12 +1,12 @@
 package br.com.home.lab.softwaretesting.automation.selenium.webdriver.components;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WrapsElement;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import org.openqa.selenium.support.ui.LoadableComponent;
 
+@Slf4j
 public abstract class GenericUI extends LoadableComponent<GenericUI> implements WrapsElement {
 
     @Getter
@@ -17,11 +17,7 @@ public abstract class GenericUI extends LoadableComponent<GenericUI> implements 
         init();
     }
 
-    protected void init(){
-        PageFactory.initElements(
-                new AjaxElementLocatorFactory(webDriver, 20),
-                this);
-    }
+    protected void init(){}
 
 
     /**
@@ -40,7 +36,7 @@ public abstract class GenericUI extends LoadableComponent<GenericUI> implements 
         try{
             loaded = isReady();
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("Error on checking whether component is loaded: {}", e.getMessage());
         }
         if(!loaded){
             throw new Error(String.format("%s is not loaded yet :/", this.getClass().getSimpleName()));

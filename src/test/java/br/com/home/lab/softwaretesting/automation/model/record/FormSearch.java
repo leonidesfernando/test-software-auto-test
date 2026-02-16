@@ -4,5 +4,5 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 @JsonSerialize
-public record FormSearch(String searchItem, boolean searchOnlyCurrentMonth, int page){}
+public record FormSearch(String searchItem, boolean searchOnlyCurrentMonth, int page, long userId){}
 

@@ -5,15 +5,22 @@ import br.com.home.lab.softwaretesting.automation.model.EntryType;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.components.GridUI;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil;
 import br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject.EntriesListPage;
+import br.com.home.lab.softwaretesting.automation.selenium.webdriver.pageobject.RemoveAllModalPage;
+import br.com.home.lab.softwaretesting.automation.util.ExcelUtil;
 import br.com.home.lab.softwaretesting.automation.util.StringUtil;
 import br.com.home.lab.softwaretesting.automation.util.Util;
 import io.qameta.allure.Step;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import java.io.IOException;
+import java.time.Duration;
 
 import static br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil.waitForElementInvisible;
 import static br.com.home.lab.softwaretesting.automation.selenium.webdriver.helper.SeleniumUtil.waitForElementVisible;
 import static br.com.home.lab.softwaretesting.automation.util.Constants.DD_MM_YYYY_SLASH;
 import static br.com.home.lab.softwaretesting.automation.util.Constants.YYYY_MMM_DD_DASH;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.testng.Assert.*;
 
 public class EntriesListAction extends BaseAction<EntriesListPage>{
@@ -34,9 +41,12 @@ public class EntriesListAction extends BaseAction<EntriesListPage>{
     @Step("Going to the home page")
     public EntriesListAction goHome() {
         page.get();
-        page.getHomeLink().click();
+        SeleniumUtil.jsClick(getWebDriver(), page.getHomeLinkBy());
         SeleniumUtil.waitAjaxCompleted(getWebDriver());
-        SeleniumUtil.waitForElementVisible(getWebDriver(), page.getHomeLink());
+        WebElement btnNew = SeleniumUtil.waitForElementVisible(getWebDriver(), page.getNewEntryBy());
+        assertThat(btnNew)
+                .isNotNull();
+        assertThat(btnNew.isDisplayed()).isTrue();
         return this;
     }
 
@@ -77,10 +87,6 @@ public class EntriesListAction extends BaseAction<EntriesListPage>{
 
     }
 
-    private String getMessageByKey(String key){
-        return Bundles.getMessage(key, getLanguage());
-    }
-
     @Step("Removing the entry with the description ${descricaoLancamento}")
     public void removeEntry(final String descricaoLancamento) {
         buscaLancamentoPorDescricao(descricaoLancamento);
@@ -119,7 +125,9 @@ public class EntriesListAction extends BaseAction<EntriesListPage>{
         page.get();
         waitForElementVisible(getWebDriver(), page.getSearchItem()).clear();
         waitForElementVisible(getWebDriver(), page.getSearchItem()).sendKeys(descricaoLancamento);
-        waitForElementVisible(getWebDriver(), page.getBtnSearch()).click();
+        SeleniumUtil.jsClick(getWebDriver(), page.getBtnSearchBy());
+        SeleniumUtil.waitAjaxCompleted(getWebDriver());
+
     }
 
     @Step("Searching entry by description with pagination (keeping the pagination of the item searched)")
@@ -127,24 +135,40 @@ public class EntriesListAction extends BaseAction<EntriesListPage>{
         page.get();
         waitForElementVisible(getWebDriver(), page.getSearchItem()).clear();
         waitForElementVisible(getWebDriver(), page.getSearchItem()).sendKeys(descricaoLancamento);
-        //waitForElementVisible(getWebDriver(), page.getFirstPaginationLink()).click();
     }
 
     @Step("Accessing the Dashboard page by Listing entries page using the button")
     public void gotToDashboard() {
         page.getBtnDashboard().click();
-        //TODO: add assertion
+        SeleniumUtil.waitTillUrlContains(getWebDriver(), "dashboard");
+        DashboardAction dashboardAction = new DashboardAction(getWebDriver());
+        dashboardAction.getPage().get();
+        dashboardAction.validateDashboardPageIsLoaded();
+
     }
 
+    public void openModalRemoveAllEntries() {
+        page.get();
+        waitForElementVisible(getWebDriver(), page.getBtnRemoveAll());
+        page.getBtnRemoveAll().click();
+        RemoveAllModalPage removeAllModalPage = new RemoveAllModalPage(getWebDriver());
+        waitForElementVisible(getWebDriver(), removeAllModalPage.getBtnYesRemoveAllBy());
+    }
 
     @Step("Removing all entries, opening the modal, confirming and managing AJAX")
-    public boolean removingAllEntries() {
+    public boolean removeAllEntries() {
         page.get();
-        page.getBtnRemoveAll().click();
-        waitForElementVisible(getWebDriver(), page.getModalRemoveAll());
-        page.getBtnYesRemoveAll().click();
-        waitForElementInvisible(getWebDriver(), page.getModalRemoveAll());
+        RemoveAllModalAction removeAllModalAction = new RemoveAllModalAction(getWebDriver());
+        removeAllModalAction.removeAllEntries();
         return checkListingIsEmpty();
+    }
+
+    @Step("Not Remove all entries, opening the modal, does not confirm and managing AJAX")
+    public boolean doNotRemoveAllEntries() {
+        page.get();
+        RemoveAllModalAction removeAllModalAction = new RemoveAllModalAction(getWebDriver());
+        removeAllModalAction.doNotRemoveAllEntries();
+        return checkListingIsNotEmpty();
     }
 
     @Step("Checking if the listing is empty")
@@ -154,14 +178,61 @@ public class EntriesListAction extends BaseAction<EntriesListPage>{
         return true;
     }
 
+    @Step("Checking if the listing is NOT empty")
+    public boolean checkListingIsNotEmpty() {
+        GridUI grid = page.getGrid();
+        assertThat(grid.areThereElements()).isTrue();
+        return true;
+    }
+
     @Step("Checking the successful entry registry message")
-    public boolean checkSuccessfulEntryRegistyMessage(){
+    public void checkSuccessfulEntryRegistyMessage(){
         final String message = page.getAlert().getText();
-        return message.equals(Util.getMessageByKey("entry.added"));
+        final var expected = Util.getMessageByKey("entry.added");
+        assertThat(message).containsPattern(expected);
+    }
+
+    @Step("Closing the entry registry success alert")
+    public void closeEntryRegistrySuccessAlert(){
+        SeleniumUtil.jsClick(getWebDriver(), page.getAlertCloseButtonBy());
+        waitForElementInvisible(getWebDriver(), page.getAlertCloseButtonBy());
+    }
+
+    @Step("Exporting entries to Excel")
+    public void clickToExportEntriesToExcel() {
+        SeleniumUtil.waitForElementVisible(getWebDriver(), page.getBtnExportBy());
+        SeleniumUtil.jsClick(getWebDriver(), page.getBtnExportBy());
+        SeleniumUtil.waitAjaxCompleted(getWebDriver());
+    }
+
+    @Step("Validating the exported Excel file header content")
+    public void validateExcelFileHeader() {
+        try {
+            ExcelUtil.validateExcelFileHeader(SeleniumUtil.waitForExcelFile(Duration.ofSeconds(30)));
+        }catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        } catch (IOException e) {
+            throw new IllegalStateException("Fail to read excel file",e);
+        }
+    }
+
+    @Step("Validating the exported Excel file is empty")
+    public void validateEmptyExcelFileHeader() {
+        try{
+            ExcelUtil.validateEmptyExcelFileHeader(SeleniumUtil.waitForExcelFile(Duration.ofSeconds(30)));
+        }catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        } catch (IOException e) {
+            throw new IllegalStateException("Fail to read excel file",e);
+        }
     }
 
     @Override
     public EntriesListPage getPage() {
         return page;
+    }
+
+    private String getMessageByKey(String key){
+        return Bundles.getMessage(key, getLanguage());
     }
 }

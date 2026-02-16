@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class GridUI extends GenericUI{
 
-    private WebElement grid;
+    private By grid;
 
     public GridUI(WebDriver webDriver) {
         super(webDriver);
@@ -21,29 +21,19 @@ public class GridUI extends GenericUI{
     @Override
     protected boolean isReady() {
         Objects.requireNonNull(grid);
-        grid = SeleniumUtil.waitForElementVisible(getWebDriver(), grid);
-        return grid.isDisplayed();
-    }
-
-    public GridUI gridElement(WebElement grid){
-        this.grid = grid;
-        return this;
+        WebElement localGrid = SeleniumUtil.waitForElementVisible(getWebDriver(), grid);
+        return localGrid.isDisplayed();
     }
 
     public GridUI id(String id){
-        this.grid = getWebDriver().findElement(By.id(id));
-        return this;
-    }
-
-    public GridUI xpath(String xpath){
-        this.grid = getWebDriver().findElement(By.xpath(xpath));
+        this.grid = By.id(id);
         return this;
     }
 
     @Override
     public WebElement getWrappedElement() {
         Objects.requireNonNull(grid);
-        return grid;
+        return getWebDriver().findElement(grid);
     }
 
     public List<WebElement> getElements(){
@@ -84,7 +74,7 @@ public class GridUI extends GenericUI{
 
     public boolean areThereElements(){
         try{
-            SeleniumUtil.waitForPresenceOfId(getWebDriver(), grid.getAttribute("id"));
+            SeleniumUtil.waitForPresenceBy(getWebDriver(), grid);
             getWebDriver().findElement(By.className("ui-empty-table"));
             return false;
         }catch (NoSuchElementException e){
